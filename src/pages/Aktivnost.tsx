@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Dashboard from "@/pages/Dashboard";
+import EvidencaAktivnostiApp from "@/components/EvidencaAktivnostiApp";
 import { useAuth } from "@/hooks/useAuth";
 
-const Index = () => {
+const Aktivnost = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -19,7 +19,7 @@ const Index = () => {
     );
   }
 
-  return <Dashboard />;
+  return <EvidencaAktivnostiApp />;
 };
 
-export default Index;
+export default Aktivnost;
