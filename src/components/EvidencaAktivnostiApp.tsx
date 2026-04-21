@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,10 +10,10 @@ import { ACTIVITY_TYPES } from "@/lib/people";
 import { useMembers } from "@/hooks/useMembers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, Shield } from "lucide-react";
+import AppShell from "@/components/AppShell";
 
 export default function EvidencaAktivnostiApp() {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user } = useAuth();
   const { members } = useMembers();
   const [datum, setDatum] = useState("");
   const [aktivnost, setAktivnost] = useState("VAJE");
@@ -102,36 +101,13 @@ export default function EvidencaAktivnostiApp() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      {/* Glava v gasilskem slogu */}
-      <header className="bg-brand-navy text-brand-navy-foreground border-b-4 border-brand-red shadow-md">
-        <div className="max-w-md md:max-w-2xl lg:max-w-3xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-md bg-brand-red text-brand-red-foreground flex items-center justify-center font-bold shadow-sm">
-              <Shield className="h-5 w-5" />
-            </div>
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide uppercase">
-              Evidenca aktivnosti
-            </h1>
-          </div>
-          <div className="flex items-center gap-1">
-            {isAdmin && (
-              <Button asChild variant="secondary" size="sm" className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground border-0">
-                <Link to="/admin"><Shield className="h-4 w-4 mr-1" />Admin</Link>
-              </Button>
-            )}
-            {user ? (
-              <Button variant="ghost" size="icon" onClick={signOut} aria-label="Odjava" className="text-brand-navy-foreground hover:bg-white/10 hover:text-brand-navy-foreground">
-                <LogOut className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button asChild size="sm" className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground"><Link to="/auth">Prijava</Link></Button>
-            )}
-          </div>
-        </div>
-      </header>
-
+    <AppShell>
       <div className="max-w-md md:max-w-2xl lg:max-w-3xl mx-auto p-3 sm:p-6 lg:p-8 space-y-4">
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-wide uppercase text-foreground">
+            Evidenca aktivnosti
+          </h1>
+        </div>
 
         <form
           onSubmit={handleSubmit}
@@ -223,6 +199,6 @@ export default function EvidencaAktivnostiApp() {
           </Button>
         </form>
       </div>
-    </main>
+    </AppShell>
   );
 }
