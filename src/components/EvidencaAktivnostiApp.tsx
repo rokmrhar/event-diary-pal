@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,19 +7,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-
-const PEOPLE = [
-  "Melissa Bajt Vodopivec",
-  "Dimitrij Bensa",
-  "Aljaž Bremec",
-  "Klemen Brisko",
-  "Leon Cijan",
-  "Boris Cotič",
-  "Filip Černič",
-  "Tadej Devetak",
-];
+import { PEOPLE, ACTIVITY_TYPES } from "@/lib/people";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { LogOut, Shield } from "lucide-react";
 
 export default function EvidencaAktivnostiApp() {
+  const { user, isAdmin, signOut } = useAuth();
   const [datum, setDatum] = useState("");
   const [aktivnost, setAktivnost] = useState("VAJE");
   const [drugo, setDrugo] = useState("");
@@ -28,6 +23,7 @@ export default function EvidencaAktivnostiApp() {
   const [opis, setOpis] = useState("");
   const [iskanje, setIskanje] = useState("");
   const [prisotni, setPrisotni] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
 
   const filtered = useMemo(
     () => PEOPLE.filter((p) => p.toLowerCase().includes(iskanje.toLowerCase())),
@@ -40,19 +36,89 @@ export default function EvidencaAktivnostiApp() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const resetForm = () => {
+    setDatum("");
+    setAktivnost("VAJE");
+    setDrugo("");
+    setZacetek("");
+    setKonec("");
+    setKraj("");
+    setOpis("");
+    setIskanje("");
+    setPrisotni([]);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast({ title: "Niste prijavljeni", description: "Prijavite se za shranjevanje.", variant: "destructive" });
+      return;
+    }
     if (!datum || !zacetek || !konec || !kraj || !opis || prisotni.length === 0) {
       toast({ title: "Manjkajoči podatki", description: "Izpolnite vsa obvezna polja.", variant: "destructive" });
       return;
     }
+    if (aktivnost === "DRUGO" && !drugo.trim()) {
+      toast({ title: "Manjka opis aktivnosti", description: "Vnesite ime aktivnosti.", variant: "destructive" });
+      return;
+    }
+
+    setSaving(true);
+    const { data: inserted, error } = await supabase
+      .from("activities")
+      .insert({
+        user_id: user.id,
+        datum,
+        aktivnost,
+        aktivnost_drugo: aktivnost === "DRUGO" ? drugo.trim() : null,
+        zacetek,
+        konec,
+        kraj,
+        opis,
+      })
+      .select("id")
+      .single();
+
+    if (error || !inserted) {
+      setSaving(false);
+      toast({ title: "Napaka pri shranjevanju", description: error?.message ?? "Poskusite znova.", variant: "destructive" });
+      return;
+    }
+
+    const { error: attErr } = await supabase
+      .from("activity_attendees")
+      .insert(prisotni.map((person_name) => ({ activity_id: inserted.id, person_name })));
+
+    setSaving(false);
+    if (attErr) {
+      toast({ title: "Napaka pri prisotnih", description: attErr.message, variant: "destructive" });
+      return;
+    }
+
     toast({ title: "Zapis shranjen", description: `${aktivnost === "DRUGO" ? drugo : aktivnost} • ${datum}` });
+    resetForm();
   };
 
   return (
     <main className="min-h-screen bg-background p-4 text-foreground">
       <div className="max-w-md mx-auto space-y-4">
-        <h1 className="text-3xl font-bold tracking-tight">EVIDENCA AKTIVNOSTI</h1>
+        <header className="flex items-center justify-between gap-2">
+          <h1 className="text-2xl font-bold tracking-tight">EVIDENCA AKTIVNOSTI</h1>
+          <div className="flex items-center gap-1">
+            {isAdmin && (
+              <Button asChild variant="outline" size="sm">
+                <Link to="/admin"><Shield className="h-4 w-4 mr-1" />Admin</Link>
+              </Button>
+            )}
+            {user ? (
+              <Button variant="ghost" size="icon" onClick={signOut} aria-label="Odjava">
+                <LogOut className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button asChild size="sm"><Link to="/auth">Prijava</Link></Button>
+            )}
+          </div>
+        </header>
 
         <form
           onSubmit={handleSubmit}
@@ -66,7 +132,7 @@ export default function EvidencaAktivnostiApp() {
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium mb-2">AKTIVNOST *</legend>
             <RadioGroup value={aktivnost} onValueChange={setAktivnost} className="space-y-2">
-              {["VAJE", "DELOVNI PONEDELJEK", "DELOVNI DAN"].map((opt) => (
+              {ACTIVITY_TYPES.filter((t) => t !== "DRUGO").map((opt) => (
                 <div key={opt} className="flex items-center gap-2">
                   <RadioGroupItem value={opt} id={opt} />
                   <Label htmlFor={opt} className="font-normal">{opt}</Label>
@@ -138,8 +204,8 @@ export default function EvidencaAktivnostiApp() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full rounded-2xl h-12 text-base font-semibold">
-            Shrani zapis
+          <Button type="submit" className="w-full rounded-2xl h-12 text-base font-semibold" disabled={saving}>
+            {saving ? "Shranjujem..." : "Shrani zapis"}
           </Button>
         </form>
       </div>
