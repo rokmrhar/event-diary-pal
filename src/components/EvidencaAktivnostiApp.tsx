@@ -7,13 +7,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { PEOPLE, ACTIVITY_TYPES } from "@/lib/people";
+import { ACTIVITY_TYPES } from "@/lib/people";
+import { useMembers } from "@/hooks/useMembers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, Shield } from "lucide-react";
 
 export default function EvidencaAktivnostiApp() {
   const { user, isAdmin, signOut } = useAuth();
+  const { members } = useMembers();
   const [datum, setDatum] = useState("");
   const [aktivnost, setAktivnost] = useState("VAJE");
   const [drugo, setDrugo] = useState("");
@@ -26,8 +28,8 @@ export default function EvidencaAktivnostiApp() {
   const [saving, setSaving] = useState(false);
 
   const filtered = useMemo(
-    () => PEOPLE.filter((p) => p.toLowerCase().includes(iskanje.toLowerCase())),
-    [iskanje]
+    () => members.filter((p) => p.name.toLowerCase().includes(iskanje.toLowerCase())),
+    [iskanje, members]
   );
 
   const togglePerson = (name: string) => {
@@ -191,14 +193,14 @@ export default function EvidencaAktivnostiApp() {
               {filtered.length === 0 && (
                 <p className="text-muted-foreground text-center py-2">Ni zadetkov</p>
               )}
-              {filtered.map((n) => (
-                <label key={n} className="flex items-center gap-2 cursor-pointer">
+              {filtered.map((m) => (
+                <label key={m.id} className="flex items-center gap-2 cursor-pointer">
                   <Checkbox
-                    checked={prisotni.includes(n)}
-                    onCheckedChange={() => togglePerson(n)}
-                    id={`p-${n}`}
+                    checked={prisotni.includes(m.name)}
+                    onCheckedChange={() => togglePerson(m.name)}
+                    id={`p-${m.id}`}
                   />
-                  <span>{n}</span>
+                  <span>{m.name}</span>
                 </label>
               ))}
             </div>

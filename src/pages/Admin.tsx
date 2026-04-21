@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowLeft, LogOut, Calendar, Clock, MapPin, FileText } from "lucide-react";
-import { ACTIVITY_TYPES, PEOPLE } from "@/lib/people";
+import { ArrowLeft, LogOut, Calendar, Clock, MapPin, FileText, UserPlus, Trash2 } from "lucide-react";
+import { ACTIVITY_TYPES } from "@/lib/people";
+import { useMembers } from "@/hooks/useMembers";
 import { toast } from "@/hooks/use-toast";
 
 type ActivityRow = {
@@ -26,10 +27,13 @@ type AttendeeRow = { person_name: string; activity_id: string };
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const { members, refresh: refreshMembers } = useMembers();
   const [activities, setActivities] = useState<ActivityRow[]>([]);
   const [attendees, setAttendees] = useState<AttendeeRow[]>([]);
   const [fetching, setFetching] = useState(true);
   const [search, setSearch] = useState("");
+  const [newMember, setNewMember] = useState("");
+  const [addingMember, setAddingMember] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -79,7 +83,7 @@ export default function Admin() {
   // person -> ActivityRow[]
   const perPerson = useMemo(() => {
     const m = new Map<string, ActivityRow[]>();
-    PEOPLE.forEach((p) => m.set(p, []));
+    members.forEach((p) => m.set(p.name, []));
     for (const at of attendees) {
       const a = activitiesById.get(at.activity_id);
       if (!a) continue;
@@ -89,7 +93,7 @@ export default function Admin() {
     // sort each person's activities by date desc
     m.forEach((arr) => arr.sort((x, y) => y.datum.localeCompare(x.datum)));
     return m;
-  }, [attendees, activitiesById]);
+  }, [attendees, activitiesById, members]);
 
   const stats = useMemo(() => {
     return Array.from(perPerson.entries())
@@ -108,6 +112,37 @@ export default function Admin() {
   }, [perPerson]);
 
   const visible = stats.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()));
+
+  const handleAddMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = newMember.trim();
+    if (!name) return;
+    setAddingMember(true);
+    const { error } = await supabase.from("members").insert({ name });
+    setAddingMember(false);
+    if (error) {
+      toast({
+        title: "Napaka",
+        description: error.code === "23505" ? "Član s tem imenom že obstaja." : error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({ title: "Član dodan", description: name });
+    setNewMember("");
+    refreshMembers();
+  };
+
+  const handleDeleteMember = async (id: string, name: string) => {
+    if (!confirm(`Izbrisati člana "${name}"? Obstoječe aktivnosti ostanejo nespremenjene.`)) return;
+    const { error } = await supabase.from("members").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Napaka", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Član izbrisan", description: name });
+    refreshMembers();
+  };
 
   const formatDate = (iso: string) => {
     try {
@@ -136,6 +171,52 @@ export default function Admin() {
         </header>
 
         <div className="bg-card border border-border rounded-2xl shadow-sm p-4 space-y-4">
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-lg font-semibold">Člani</h2>
+              <p className="text-sm text-muted-foreground">
+                Upravljaj seznam članov, ki se prikažejo v obrazcu evidence.
+              </p>
+            </div>
+            <form onSubmit={handleAddMember} className="flex gap-2">
+              <Input
+                placeholder="Ime in priimek novega člana"
+                value={newMember}
+                onChange={(e) => setNewMember(e.target.value)}
+                maxLength={100}
+              />
+              <Button type="submit" disabled={addingMember || !newMember.trim()}>
+                <UserPlus className="h-4 w-4 mr-1" />
+                Dodaj
+              </Button>
+            </form>
+            <div className="flex flex-wrap gap-2">
+              {members.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Ni članov.</p>
+              ) : (
+                members.map((m) => (
+                  <div
+                    key={m.id}
+                    className="flex items-center gap-2 bg-secondary rounded-full pl-3 pr-1 py-1 text-sm"
+                  >
+                    <span>{m.name}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 rounded-full hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => handleDeleteMember(m.id, m.name)}
+                      aria-label={`Izbriši ${m.name}`}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="border-t border-border pt-4 space-y-4">
           <Input
             placeholder="Išči osebo..."
             value={search}
@@ -184,6 +265,7 @@ export default function Admin() {
                 )}
               </TableBody>
             </Table>
+          </div>
           </div>
         </div>
 
