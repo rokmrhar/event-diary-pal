@@ -96,7 +96,11 @@ export default function StatsTab() {
         }
         return { name, list, counts };
       })
-      .sort((a, b) => b.counts.total - a.counts.total || a.name.localeCompare(b.name));
+      .sort((a, b) => {
+        const sa = a.name.trim().split(/\s+/).pop() ?? a.name;
+        const sb = b.name.trim().split(/\s+/).pop() ?? b.name;
+        return sa.localeCompare(sb, "sl") || a.name.localeCompare(b.name, "sl");
+      });
   }, [perPerson]);
 
   const visible = stats.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()));
