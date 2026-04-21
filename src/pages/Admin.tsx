@@ -29,14 +29,14 @@ export default function Admin() {
   if (!isAdmin) return null;
 
   return (
-    <main className="min-h-screen bg-background p-4 text-foreground">
-      <div className="max-w-5xl mx-auto space-y-4">
-        <header className="flex items-center justify-between gap-2 flex-wrap">
+    <main className="min-h-screen bg-background p-3 sm:p-6 lg:p-8 text-foreground">
+      <div className="max-w-7xl mx-auto space-y-4">
+        <header className="flex items-center justify-between gap-2 flex-wrap sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 -mx-3 px-3 sm:-mx-6 sm:px-6 py-2 border-b border-border">
           <div className="flex items-center gap-2">
             <Button asChild variant="ghost" size="icon">
               <Link to="/" aria-label="Nazaj"><ArrowLeft className="h-4 w-4" /></Link>
             </Button>
-            <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Admin</h1>
           </div>
           <Button variant="ghost" size="icon" onClick={signOut} aria-label="Odjava">
             <LogOut className="h-4 w-4" />
@@ -44,14 +44,14 @@ export default function Admin() {
         </header>
 
         <Tabs defaultValue="stats" className="w-full">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full h-auto">
-            <TabsTrigger value="stats">Statistika</TabsTrigger>
-            <TabsTrigger value="activities">Aktivnosti</TabsTrigger>
-            <TabsTrigger value="members">Člani</TabsTrigger>
-            <TabsTrigger value="users">Uporabniki</TabsTrigger>
+          <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full h-auto gap-1">
+            <TabsTrigger value="stats" className="text-xs sm:text-sm">Statistika</TabsTrigger>
+            <TabsTrigger value="activities" className="text-xs sm:text-sm">Aktivnosti</TabsTrigger>
+            <TabsTrigger value="members" className="text-xs sm:text-sm">Člani</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs sm:text-sm">Uporabniki</TabsTrigger>
           </TabsList>
 
-          <div className="bg-card border border-border rounded-2xl shadow-sm p-4 mt-4">
+          <div className="bg-card border border-border rounded-2xl shadow-sm p-3 sm:p-5 lg:p-6 mt-4">
             <TabsContent value="stats" className="mt-0">
               <StatsTab />
             </TabsContent>
