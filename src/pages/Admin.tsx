@@ -171,6 +171,52 @@ export default function Admin() {
         </header>
 
         <div className="bg-card border border-border rounded-2xl shadow-sm p-4 space-y-4">
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-lg font-semibold">Člani</h2>
+              <p className="text-sm text-muted-foreground">
+                Upravljaj seznam članov, ki se prikažejo v obrazcu evidence.
+              </p>
+            </div>
+            <form onSubmit={handleAddMember} className="flex gap-2">
+              <Input
+                placeholder="Ime in priimek novega člana"
+                value={newMember}
+                onChange={(e) => setNewMember(e.target.value)}
+                maxLength={100}
+              />
+              <Button type="submit" disabled={addingMember || !newMember.trim()}>
+                <UserPlus className="h-4 w-4 mr-1" />
+                Dodaj
+              </Button>
+            </form>
+            <div className="flex flex-wrap gap-2">
+              {members.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Ni članov.</p>
+              ) : (
+                members.map((m) => (
+                  <div
+                    key={m.id}
+                    className="flex items-center gap-2 bg-secondary rounded-full pl-3 pr-1 py-1 text-sm"
+                  >
+                    <span>{m.name}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 rounded-full hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => handleDeleteMember(m.id, m.name)}
+                      aria-label={`Izbriši ${m.name}`}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="border-t border-border pt-4 space-y-4">
           <Input
             placeholder="Išči osebo..."
             value={search}
@@ -219,6 +265,7 @@ export default function Admin() {
                 )}
               </TableBody>
             </Table>
+          </div>
           </div>
         </div>
 
