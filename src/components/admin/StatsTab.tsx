@@ -97,8 +97,10 @@ export default function StatsTab() {
         return { name, list, counts };
       })
       .sort((a, b) => {
-        const sa = a.name.trim().split(/\s+/).pop() ?? a.name;
-        const sb = b.name.trim().split(/\s+/).pop() ?? b.name;
+        const pa = a.name.trim().split(/\s+/);
+        const pb = b.name.trim().split(/\s+/);
+        const sa = pa.length > 1 ? pa[1] : a.name;
+        const sb = pb.length > 1 ? pb[1] : b.name;
         return sa.localeCompare(sb, "sl") || a.name.localeCompare(b.name, "sl");
       });
   }, [perPerson]);
