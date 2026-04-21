@@ -113,6 +113,37 @@ export default function Admin() {
 
   const visible = stats.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()));
 
+  const handleAddMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = newMember.trim();
+    if (!name) return;
+    setAddingMember(true);
+    const { error } = await supabase.from("members").insert({ name });
+    setAddingMember(false);
+    if (error) {
+      toast({
+        title: "Napaka",
+        description: error.code === "23505" ? "Član s tem imenom že obstaja." : error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({ title: "Član dodan", description: name });
+    setNewMember("");
+    refreshMembers();
+  };
+
+  const handleDeleteMember = async (id: string, name: string) => {
+    if (!confirm(`Izbrisati člana "${name}"? Obstoječe aktivnosti ostanejo nespremenjene.`)) return;
+    const { error } = await supabase.from("members").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Napaka", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Član izbrisan", description: name });
+    refreshMembers();
+  };
+
   const formatDate = (iso: string) => {
     try {
       return new Date(iso).toLocaleDateString("sl-SI", { day: "2-digit", month: "2-digit", year: "numeric" });
