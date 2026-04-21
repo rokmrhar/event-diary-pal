@@ -157,11 +157,21 @@ export default function StatsTab() {
               visible.map(({ name, counts }) => (
                 <TableRow key={name}>
                   <TableCell className="font-medium">{name}</TableCell>
-                  {ACTIVITY_TYPES.map((t) => (
-                    <TableCell key={t} className="text-center tabular-nums">
-                      {counts[t] ?? 0}
-                    </TableCell>
-                  ))}
+                  {ACTIVITY_TYPES.map((t) => {
+                    const colors = ACTIVITY_COLORS[t] ?? ACTIVITY_COLORS["DRUGO"];
+                    const count = counts[t] ?? 0;
+                    return (
+                      <TableCell key={t} className="text-center tabular-nums">
+                        {count > 0 ? (
+                          <Badge className={`${colors.bg} text-white border-0`}>
+                            {count}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
+                      </TableCell>
+                    );
+                  })}
                   <TableCell className="text-right font-semibold tabular-nums">
                     {counts.total}
                   </TableCell>
