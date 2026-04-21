@@ -9,6 +9,14 @@ import { Calendar, Clock, MapPin, FileText } from "lucide-react";
 import { ACTIVITY_TYPES } from "@/lib/people";
 import { toast } from "@/hooks/use-toast";
 
+// Barvno kodiranje vrst aktivnosti
+const ACTIVITY_COLORS: Record<string, { bg: string; text: string; border: string; lightBg: string }> = {
+  "VAJE": { bg: "bg-blue-500", text: "text-blue-500", border: "border-blue-500", lightBg: "bg-blue-50" },
+  "DELOVNI PONEDELJEK": { bg: "bg-emerald-500", text: "text-emerald-500", border: "border-emerald-500", lightBg: "bg-emerald-50" },
+  "DELOVNI DAN": { bg: "bg-amber-500", text: "text-amber-500", border: "border-amber-500", lightBg: "bg-amber-50" },
+  "DRUGO": { bg: "bg-purple-500", text: "text-purple-500", border: "border-purple-500", lightBg: "bg-purple-50" },
+};
+
 type ActivityRow = {
   id: string;
   datum: string;
