@@ -195,13 +195,19 @@ export default function StatsTab() {
                 <span className="font-medium truncate">{name}</span>
                 <Badge>{counts.total}</Badge>
               </div>
-              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                {ACTIVITY_TYPES.map((t) => (
-                  <div key={t} className="flex justify-between">
-                    <span className="truncate">{t}</span>
-                    <span className="tabular-nums font-medium text-foreground">{counts[t] ?? 0}</span>
-                  </div>
-                ))}
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                {ACTIVITY_TYPES.map((t) => {
+                  const colors = ACTIVITY_COLORS[t] ?? ACTIVITY_COLORS["DRUGO"];
+                  const count = counts[t] ?? 0;
+                  return (
+                    <div key={t} className="flex justify-between items-center">
+                      <span className={`truncate ${colors.text} font-medium`}>{t}</span>
+                      <span className={`tabular-nums font-semibold ${count > 0 ? colors.text : 'text-muted-foreground'}`}>
+                        {count}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))
