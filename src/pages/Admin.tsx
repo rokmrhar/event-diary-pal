@@ -29,20 +29,26 @@ export default function Admin() {
   if (!isAdmin) return null;
 
   return (
-    <main className="min-h-screen bg-background p-3 sm:p-6 lg:p-8 text-foreground">
-      <div className="max-w-7xl mx-auto space-y-4">
-        <header className="flex items-center justify-between gap-2 flex-wrap sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 -mx-3 px-3 sm:-mx-6 sm:px-6 py-2 border-b border-border">
+    <main className="min-h-screen bg-background text-foreground">
+      {/* Glava v gasilskem slogu */}
+      <header className="bg-brand-navy text-brand-navy-foreground border-b-4 border-brand-red shadow-md sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="icon">
+            <Button asChild variant="ghost" size="icon" className="text-brand-navy-foreground hover:bg-white/10 hover:text-brand-navy-foreground">
               <Link to="/" aria-label="Nazaj"><ArrowLeft className="h-4 w-4" /></Link>
             </Button>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Admin</h1>
+            <div className="h-9 w-9 rounded-md bg-brand-red text-brand-red-foreground flex items-center justify-center font-bold shadow-sm">
+              <span className="text-xs font-bold">A</span>
+            </div>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-wide uppercase">Admin</h1>
           </div>
-          <Button variant="ghost" size="icon" onClick={signOut} aria-label="Odjava">
+          <Button variant="ghost" size="icon" onClick={signOut} aria-label="Odjava" className="text-brand-navy-foreground hover:bg-white/10 hover:text-brand-navy-foreground">
             <LogOut className="h-4 w-4" />
           </Button>
-        </header>
+        </div>
+      </header>
 
+      <div className="max-w-7xl mx-auto p-3 sm:p-6 lg:p-8 space-y-4">
         <Tabs defaultValue="stats" className="w-full">
           <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full h-auto gap-1">
             <TabsTrigger value="stats" className="text-xs sm:text-sm">Statistika</TabsTrigger>
