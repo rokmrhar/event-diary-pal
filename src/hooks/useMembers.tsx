@@ -29,8 +29,10 @@ export function useMembers() {
   return { members, loading, refresh };
 }
 
-// Priimek = zadnja beseda v imenu (npr. "Janez Novak" -> "Novak")
+// Priimek = prva beseda za imenom (npr. "Janez Novak" -> "Novak",
+// "Janez Novak Kovač" -> "Novak"). Pri enobesednih vnosih vrne celoto.
 function getSurname(fullName: string): string {
   const parts = fullName.trim().split(/\s+/);
-  return parts[parts.length - 1] ?? fullName;
+  if (parts.length <= 1) return fullName;
+  return parts[1];
 }
