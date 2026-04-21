@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowLeft, LogOut, Calendar, Clock, MapPin, FileText } from "lucide-react";
-import { ACTIVITY_TYPES, PEOPLE } from "@/lib/people";
+import { ArrowLeft, LogOut, Calendar, Clock, MapPin, FileText, UserPlus, Trash2 } from "lucide-react";
+import { ACTIVITY_TYPES } from "@/lib/people";
+import { useMembers } from "@/hooks/useMembers";
 import { toast } from "@/hooks/use-toast";
 
 type ActivityRow = {
@@ -26,10 +27,13 @@ type AttendeeRow = { person_name: string; activity_id: string };
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const { members, refresh: refreshMembers } = useMembers();
   const [activities, setActivities] = useState<ActivityRow[]>([]);
   const [attendees, setAttendees] = useState<AttendeeRow[]>([]);
   const [fetching, setFetching] = useState(true);
   const [search, setSearch] = useState("");
+  const [newMember, setNewMember] = useState("");
+  const [addingMember, setAddingMember] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -79,7 +83,7 @@ export default function Admin() {
   // person -> ActivityRow[]
   const perPerson = useMemo(() => {
     const m = new Map<string, ActivityRow[]>();
-    PEOPLE.forEach((p) => m.set(p, []));
+    members.forEach((p) => m.set(p.name, []));
     for (const at of attendees) {
       const a = activitiesById.get(at.activity_id);
       if (!a) continue;
@@ -89,7 +93,7 @@ export default function Admin() {
     // sort each person's activities by date desc
     m.forEach((arr) => arr.sort((x, y) => y.datum.localeCompare(x.datum)));
     return m;
-  }, [attendees, activitiesById]);
+  }, [attendees, activitiesById, members]);
 
   const stats = useMemo(() => {
     return Array.from(perPerson.entries())
