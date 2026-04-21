@@ -8,7 +8,7 @@ import {
   Archive,
   Truck,
   Wrench,
-  Briefcase,
+  PencilLine,
   Stethoscope,
   Flame,
   ShieldCheck,
@@ -22,6 +22,7 @@ import {
   Power,
   UserCircle2,
   Clock,
+  LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,13 +31,15 @@ interface AppShellProps {
   children: ReactNode;
 }
 
-const sidebarItems = [
+type SidebarItem = { icon: LucideIcon; label: string; to?: string };
+
+const sidebarItems: SidebarItem[] = [
   { icon: AlertCircle, label: "DOGODEK VEČJEGA OBSEGA" },
   { icon: ClipboardList, label: "POROČILO O INTERVENCIJI" },
   { icon: Archive, label: "ARHIV INTERVENCIJ" },
   { icon: Truck, label: "POTNI NALOG" },
   { icon: Wrench, label: "PREGLED SERVISOV" },
-  { icon: Briefcase, label: "DELOVNI DAN" },
+  { icon: PencilLine, label: "VNOS AKTIVNOSTI", to: "/aktivnost" },
   { icon: Stethoscope, label: "ZDRAVNIŠKI PREGLEDI" },
   { icon: Flame, label: "POŽARNE STRAŽE" },
   { icon: ShieldCheck, label: "EVIDENCA IDA" },
@@ -99,15 +102,25 @@ export default function AppShell({ children }: AppShellProps) {
 
         {/* Nav items */}
         <nav className="flex-1 overflow-y-auto px-2 py-1 space-y-0.5 text-[11px] font-semibold">
-          {sidebarItems.map((item) => (
-            <button
-              key={item.label}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-white/10 text-left tracking-wide"
-            >
-              <item.icon className="h-4 w-4 text-brand-red shrink-0" />
-              <span className="truncate">{item.label}</span>
-            </button>
-          ))}
+          {sidebarItems.map((item) => {
+            const inner = (
+              <>
+                <item.icon className="h-4 w-4 text-brand-red shrink-0" />
+                <span className="truncate">{item.label}</span>
+              </>
+            );
+            const cls =
+              "w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-white/10 text-left tracking-wide";
+            return item.to ? (
+              <Link key={item.label} to={item.to} className={cls} onClick={() => setSidebarOpen(false)}>
+                {inner}
+              </Link>
+            ) : (
+              <button key={item.label} className={cls}>
+                {inner}
+              </button>
+            );
+          })}
         </nav>
 
         {/* Footer */}
