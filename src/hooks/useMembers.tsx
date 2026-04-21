@@ -11,9 +11,14 @@ export function useMembers() {
     setLoading(true);
     const { data, error } = await supabase
       .from("members")
-      .select("id, name")
-      .order("name", { ascending: true });
-    if (!error && data) setMembers(data as Member[]);
+      .select("id, name");
+    if (!error && data) {
+      const sorted = [...(data as Member[])].sort((a, b) =>
+        getSurname(a.name).localeCompare(getSurname(b.name), "sl") ||
+        a.name.localeCompare(b.name, "sl")
+      );
+      setMembers(sorted);
+    }
     setLoading(false);
   }, []);
 
@@ -22,4 +27,10 @@ export function useMembers() {
   }, [refresh]);
 
   return { members, loading, refresh };
+}
+
+// Priimek = zadnja beseda v imenu (npr. "Janez Novak" -> "Novak")
+function getSurname(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  return parts[parts.length - 1] ?? fullName;
 }
