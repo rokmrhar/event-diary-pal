@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Menu,
@@ -50,8 +50,13 @@ const sidebarItems: SidebarItem[] = [
 export default function AppShell({ children }: AppShellProps) {
   const { user, isAdmin, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [now, setNow] = useState(() => new Date());
 
-  const now = new Date();
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
   const dateStr = now.toLocaleDateString("sl-SI");
   const timeStr = now.toLocaleTimeString("sl-SI", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
