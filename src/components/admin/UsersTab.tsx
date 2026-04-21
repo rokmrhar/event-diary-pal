@@ -88,10 +88,10 @@ export default function UsersTab() {
         placeholder="Išči uporabnika..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm"
+        className="max-w-sm w-full"
       />
 
-      <div className="overflow-x-auto border border-border rounded-xl">
+      <div className="hidden sm:block overflow-x-auto border border-border rounded-xl">
         <Table>
           <TableHeader>
             <TableRow>
@@ -149,6 +149,49 @@ export default function UsersTab() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="sm:hidden space-y-3">
+        {loading ? (
+          <p className="text-center text-muted-foreground py-8 text-sm">Nalagam...</p>
+        ) : visible.length === 0 ? (
+          <p className="text-center text-muted-foreground py-8 text-sm">Ni uporabnikov</p>
+        ) : (
+          visible.map((p) => {
+            const admin = isAdminUser(p.user_id);
+            const isSelf = p.user_id === currentUser?.id;
+            return (
+              <div key={p.user_id} className="border border-border rounded-xl p-3 bg-card">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="font-medium truncate">
+                      {p.email ?? "—"}
+                      {isSelf && <span className="ml-1 text-xs text-muted-foreground">(vi)</span>}
+                    </p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {p.display_name ?? "—"}
+                    </p>
+                    <Badge variant={admin ? "default" : "secondary"}>
+                      {admin ? "admin" : "user"}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <Label htmlFor={`adm-m-${p.user_id}`} className="text-xs text-muted-foreground">
+                      Admin
+                    </Label>
+                    <Switch
+                      id={`adm-m-${p.user_id}`}
+                      checked={admin}
+                      disabled={pendingId === p.user_id}
+                      onCheckedChange={(checked) => toggleAdmin(p.user_id, checked)}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

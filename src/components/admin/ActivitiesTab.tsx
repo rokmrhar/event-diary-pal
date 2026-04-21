@@ -187,10 +187,11 @@ export default function ActivitiesTab() {
         placeholder="Išči aktivnost (tip, kraj, opis, datum)..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm"
+        className="max-w-sm w-full"
       />
 
-      <div className="overflow-x-auto border border-border rounded-xl">
+      {/* Desktop / tablet table */}
+      <div className="hidden md:block overflow-x-auto border border-border rounded-xl">
         <Table>
           <TableHeader>
             <TableRow>
@@ -255,6 +256,48 @@ export default function ActivitiesTab() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          <p className="text-center text-muted-foreground py-8 text-sm">Nalagam...</p>
+        ) : visible.length === 0 ? (
+          <p className="text-center text-muted-foreground py-8 text-sm">Ni aktivnosti</p>
+        ) : (
+          visible.map((a) => (
+            <div key={a.id} className="border border-border rounded-xl p-3 bg-card space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <div className="space-y-1 min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge variant="outline">{labelFor(a)}</Badge>
+                    <span className="text-sm text-muted-foreground">{formatDate(a.datum)}</span>
+                  </div>
+                  <p className="text-sm tabular-nums">
+                    {formatTime(a.zacetek)}–{formatTime(a.konec)} • {a.kraj}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Prisotni: {(attendeesByActivity.get(a.id) ?? []).length}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-1 shrink-0">
+                  <Button size="icon" variant="ghost" onClick={() => startEdit(a)} aria-label="Uredi">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => handleDelete(a)}
+                    aria-label="Izbriši"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>

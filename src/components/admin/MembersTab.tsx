@@ -80,14 +80,14 @@ export default function MembersTab() {
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleAdd} className="flex gap-2">
+      <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-2">
         <Input
           placeholder="Ime in priimek novega člana"
           value={newMember}
           onChange={(e) => setNewMember(e.target.value)}
           maxLength={100}
         />
-        <Button type="submit" disabled={adding || !newMember.trim()}>
+        <Button type="submit" disabled={adding || !newMember.trim()} className="sm:w-auto w-full">
           <UserPlus className="h-4 w-4 mr-1" />
           Dodaj
         </Button>
@@ -97,7 +97,7 @@ export default function MembersTab() {
         placeholder="Išči člana..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm"
+        className="max-w-sm w-full"
       />
 
       <div className="overflow-x-auto border border-border rounded-xl">

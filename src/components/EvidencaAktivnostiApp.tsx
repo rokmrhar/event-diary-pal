@@ -102,10 +102,10 @@ export default function EvidencaAktivnostiApp() {
   };
 
   return (
-    <main className="min-h-screen bg-background p-4 text-foreground">
-      <div className="max-w-md mx-auto space-y-4">
-        <header className="flex items-center justify-between gap-2">
-          <h1 className="text-2xl font-bold tracking-tight">EVIDENCA AKTIVNOSTI</h1>
+    <main className="min-h-screen bg-background p-3 sm:p-6 lg:p-8 text-foreground">
+      <div className="max-w-md md:max-w-2xl lg:max-w-3xl mx-auto space-y-4">
+        <header className="flex items-center justify-between gap-2 flex-wrap">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">EVIDENCA AKTIVNOSTI</h1>
           <div className="flex items-center gap-1">
             {isAdmin && (
               <Button asChild variant="outline" size="sm">
@@ -124,23 +124,29 @@ export default function EvidencaAktivnostiApp() {
 
         <form
           onSubmit={handleSubmit}
-          className="bg-card text-card-foreground rounded-2xl shadow-sm border border-border p-4 space-y-5"
+          className="bg-card text-card-foreground rounded-2xl shadow-sm border border-border p-4 sm:p-6 space-y-5"
         >
-          <div className="space-y-1.5">
-            <Label htmlFor="datum">DATUM *</Label>
-            <Input id="datum" type="date" value={datum} onChange={(e) => setDatum(e.target.value)} required />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="datum">DATUM *</Label>
+              <Input id="datum" type="date" value={datum} onChange={(e) => setDatum(e.target.value)} required />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="kraj">KRAJ *</Label>
+              <Input id="kraj" placeholder="Lokacija" value={kraj} onChange={(e) => setKraj(e.target.value)} required />
+            </div>
           </div>
 
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium mb-2">AKTIVNOST *</legend>
-            <RadioGroup value={aktivnost} onValueChange={setAktivnost} className="space-y-2">
+            <RadioGroup value={aktivnost} onValueChange={setAktivnost} className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {ACTIVITY_TYPES.filter((t) => t !== "DRUGO").map((opt) => (
                 <div key={opt} className="flex items-center gap-2">
                   <RadioGroupItem value={opt} id={opt} />
                   <Label htmlFor={opt} className="font-normal">{opt}</Label>
                 </div>
               ))}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 sm:col-span-2">
                 <RadioGroupItem value="DRUGO" id="DRUGO" />
                 <Label htmlFor="DRUGO" className="font-normal">DRUGO</Label>
                 <Input
@@ -166,11 +172,6 @@ export default function EvidencaAktivnostiApp() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="kraj">KRAJ *</Label>
-            <Input id="kraj" placeholder="Lokacija" value={kraj} onChange={(e) => setKraj(e.target.value)} required />
-          </div>
-
-          <div className="space-y-1.5">
             <Label htmlFor="opis">OPIS / OPOMBE *</Label>
             <Textarea
               id="opis"
@@ -189,9 +190,9 @@ export default function EvidencaAktivnostiApp() {
               value={iskanje}
               onChange={(e) => setIskanje(e.target.value)}
             />
-            <div className="max-h-64 overflow-auto space-y-2 border border-border rounded-xl p-3 text-sm bg-secondary/30">
+            <div className="max-h-64 md:max-h-80 overflow-auto grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border border-border rounded-xl p-3 text-sm bg-secondary/30">
               {filtered.length === 0 && (
-                <p className="text-muted-foreground text-center py-2">Ni zadetkov</p>
+                <p className="text-muted-foreground text-center py-2 sm:col-span-2">Ni zadetkov</p>
               )}
               {filtered.map((m) => (
                 <label key={m.id} className="flex items-center gap-2 cursor-pointer">

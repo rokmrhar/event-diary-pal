@@ -107,10 +107,10 @@ export default function StatsTab() {
         placeholder="Išči osebo..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm"
+        className="max-w-sm w-full"
       />
 
-      <div className="overflow-x-auto border border-border rounded-xl">
+      <div className="hidden sm:block overflow-x-auto border border-border rounded-xl">
         <Table>
           <TableHeader>
             <TableRow>
@@ -151,6 +151,32 @@ export default function StatsTab() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile compact summary */}
+      <div className="sm:hidden space-y-2">
+        {loading ? (
+          <p className="text-center text-muted-foreground py-6 text-sm">Nalagam...</p>
+        ) : visible.length === 0 ? (
+          <p className="text-center text-muted-foreground py-6 text-sm">Ni rezultatov</p>
+        ) : (
+          visible.map(({ name, counts }) => (
+            <div key={name} className="border border-border rounded-xl p-3 bg-card">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="font-medium truncate">{name}</span>
+                <Badge>{counts.total}</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                {ACTIVITY_TYPES.map((t) => (
+                  <div key={t} className="flex justify-between">
+                    <span className="truncate">{t}</span>
+                    <span className="tabular-nums font-medium text-foreground">{counts[t] ?? 0}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <div className="space-y-2">
