@@ -129,9 +129,14 @@ export default function StatsTab() {
           <TableHeader>
             <TableRow>
               <TableHead>Oseba</TableHead>
-              {ACTIVITY_TYPES.map((t) => (
-                <TableHead key={t} className="text-center">{t}</TableHead>
-              ))}
+              {ACTIVITY_TYPES.map((t) => {
+                const colors = ACTIVITY_COLORS[t] ?? ACTIVITY_COLORS["DRUGO"];
+                return (
+                  <TableHead key={t} className={`text-center ${colors.text}`}>
+                    {t}
+                  </TableHead>
+                );
+              })}
               <TableHead className="text-right">Skupaj</TableHead>
             </TableRow>
           </TableHeader>
