@@ -9,6 +9,14 @@ import { Calendar, Clock, MapPin, FileText } from "lucide-react";
 import { ACTIVITY_TYPES } from "@/lib/people";
 import { toast } from "@/hooks/use-toast";
 
+// Barvno kodiranje vrst aktivnosti
+const ACTIVITY_COLORS: Record<string, { bg: string; text: string; border: string; lightBg: string }> = {
+  "VAJE": { bg: "bg-blue-500", text: "text-blue-500", border: "border-blue-500", lightBg: "bg-blue-50" },
+  "DELOVNI PONEDELJEK": { bg: "bg-emerald-500", text: "text-emerald-500", border: "border-emerald-500", lightBg: "bg-emerald-50" },
+  "DELOVNI DAN": { bg: "bg-amber-500", text: "text-amber-500", border: "border-amber-500", lightBg: "bg-amber-50" },
+  "DRUGO": { bg: "bg-purple-500", text: "text-purple-500", border: "border-purple-500", lightBg: "bg-purple-50" },
+};
+
 type ActivityRow = {
   id: string;
   datum: string;
@@ -121,9 +129,14 @@ export default function StatsTab() {
           <TableHeader>
             <TableRow>
               <TableHead>Oseba</TableHead>
-              {ACTIVITY_TYPES.map((t) => (
-                <TableHead key={t} className="text-center">{t}</TableHead>
-              ))}
+              {ACTIVITY_TYPES.map((t) => {
+                const colors = ACTIVITY_COLORS[t] ?? ACTIVITY_COLORS["DRUGO"];
+                return (
+                  <TableHead key={t} className={`text-center ${colors.text}`}>
+                    {t}
+                  </TableHead>
+                );
+              })}
               <TableHead className="text-right">Skupaj</TableHead>
             </TableRow>
           </TableHeader>
@@ -144,11 +157,21 @@ export default function StatsTab() {
               visible.map(({ name, counts }) => (
                 <TableRow key={name}>
                   <TableCell className="font-medium">{name}</TableCell>
-                  {ACTIVITY_TYPES.map((t) => (
-                    <TableCell key={t} className="text-center tabular-nums">
-                      {counts[t] ?? 0}
-                    </TableCell>
-                  ))}
+                  {ACTIVITY_TYPES.map((t) => {
+                    const colors = ACTIVITY_COLORS[t] ?? ACTIVITY_COLORS["DRUGO"];
+                    const count = counts[t] ?? 0;
+                    return (
+                      <TableCell key={t} className="text-center tabular-nums">
+                        {count > 0 ? (
+                          <Badge className={`${colors.bg} text-white border-0`}>
+                            {count}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">0</span>
+                        )}
+                      </TableCell>
+                    );
+                  })}
                   <TableCell className="text-right font-semibold tabular-nums">
                     {counts.total}
                   </TableCell>
@@ -172,13 +195,19 @@ export default function StatsTab() {
                 <span className="font-medium truncate">{name}</span>
                 <Badge>{counts.total}</Badge>
               </div>
-              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                {ACTIVITY_TYPES.map((t) => (
-                  <div key={t} className="flex justify-between">
-                    <span className="truncate">{t}</span>
-                    <span className="tabular-nums font-medium text-foreground">{counts[t] ?? 0}</span>
-                  </div>
-                ))}
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                {ACTIVITY_TYPES.map((t) => {
+                  const colors = ACTIVITY_COLORS[t] ?? ACTIVITY_COLORS["DRUGO"];
+                  const count = counts[t] ?? 0;
+                  return (
+                    <div key={t} className="flex justify-between items-center">
+                      <span className={`truncate ${colors.text} font-medium`}>{t}</span>
+                      <span className={`tabular-nums font-semibold ${count > 0 ? colors.text : 'text-muted-foreground'}`}>
+                        {count}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))
