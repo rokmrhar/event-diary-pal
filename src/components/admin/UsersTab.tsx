@@ -17,17 +17,21 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { MODULES, type ModuleKey } from "@/hooks/useModulePermissions";
 
 type Profile = { user_id: string; email: string | null; display_name: string | null };
 type RoleRow = { user_id: string; role: "admin" | "user" };
+type PermRow = { user_id: string; module: string };
 
 export default function UsersTab() {
   const { user: currentUser } = useAuth();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<RoleRow[]>([]);
+  const [perms, setPerms] = useState<PermRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [permPending, setPermPending] = useState<string | null>(null);
   const [editing, setEditing] = useState<Profile | null>(null);
   const [editEmail, setEditEmail] = useState("");
   const [editName, setEditName] = useState("");
@@ -36,19 +40,21 @@ export default function UsersTab() {
 
   const load = async () => {
     setLoading(true);
-    const [p, r] = await Promise.all([
+    const [p, r, mp] = await Promise.all([
       supabase.from("profiles").select("user_id, email, display_name"),
       supabase.from("user_roles").select("user_id, role"),
+      supabase.from("user_module_permissions").select("user_id, module"),
     ]);
-    if (p.error || r.error) {
+    if (p.error || r.error || mp.error) {
       toast({
         title: "Napaka",
-        description: p.error?.message ?? r.error?.message ?? "",
+        description: p.error?.message ?? r.error?.message ?? mp.error?.message ?? "",
         variant: "destructive",
       });
     } else {
       setProfiles((p.data ?? []) as Profile[]);
       setRoles((r.data ?? []) as RoleRow[]);
+      setPerms((mp.data ?? []) as PermRow[]);
     }
     setLoading(false);
   };
@@ -58,6 +64,36 @@ export default function UsersTab() {
   }, []);
 
   const isAdminUser = (uid: string) => roles.some((r) => r.user_id === uid && r.role === "admin");
+  const hasPerm = (uid: string, module: ModuleKey) =>
+    perms.some((p) => p.user_id === uid && p.module === module);
+
+  const togglePerm = async (uid: string, module: ModuleKey, enable: boolean) => {
+    setPermPending(`${uid}-${module}`);
+    if (enable) {
+      const { error } = await supabase
+        .from("user_module_permissions")
+        .insert({ user_id: uid, module });
+      if (error && error.code !== "23505") {
+        setPermPending(null);
+        toast({ title: "Napaka", description: error.message, variant: "destructive" });
+        return;
+      }
+    } else {
+      const { error } = await supabase
+        .from("user_module_permissions")
+        .delete()
+        .eq("user_id", uid)
+        .eq("module", module);
+      if (error) {
+        setPermPending(null);
+        toast({ title: "Napaka", description: error.message, variant: "destructive" });
+        return;
+      }
+    }
+    setPermPending(null);
+    toast({ title: enable ? "Pravica dodana" : "Pravica odvzeta" });
+    load();
+  };
 
   const toggleAdmin = async (uid: string, makeAdmin: boolean) => {
     if (uid === currentUser?.id && !makeAdmin) {
