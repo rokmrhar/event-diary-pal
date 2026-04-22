@@ -11,10 +11,14 @@ import { useMembers } from "@/hooks/useMembers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AppShell from "@/components/AppShell";
+import { useModulePermissions } from "@/hooks/useModulePermissions";
+import { Lock } from "lucide-react";
 
 export default function EvidencaAktivnostiApp() {
   const { user } = useAuth();
   const { members } = useMembers();
+  const { canEdit, loading: permLoading } = useModulePermissions();
+  const allowed = canEdit("activities");
   const [datum, setDatum] = useState("");
   const [aktivnost, setAktivnost] = useState("VAJE");
   const [drugo, setDrugo] = useState("");
@@ -109,6 +113,18 @@ export default function EvidencaAktivnostiApp() {
           </h1>
         </div>
 
+        {!permLoading && !allowed && (
+          <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-2">
+            <Lock className="h-10 w-10 mx-auto text-muted-foreground" />
+            <h2 className="font-semibold">Nimate pravic za vnos</h2>
+            <p className="text-sm text-muted-foreground">
+              Za vnos aktivnosti vas mora administrator omogočiti pravice. Lahko si ogledate
+              obstoječe zapise v statistiki.
+            </p>
+          </div>
+        )}
+
+        {allowed && (
         <form
           onSubmit={handleSubmit}
           className="bg-card text-card-foreground rounded-2xl shadow-sm border border-border p-4 sm:p-6 space-y-5"
