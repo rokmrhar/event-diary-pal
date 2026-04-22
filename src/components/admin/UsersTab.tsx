@@ -5,7 +5,17 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Pencil } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 type Profile = { user_id: string; email: string | null; display_name: string | null };
@@ -18,6 +28,11 @@ export default function UsersTab() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Profile | null>(null);
+  const [editEmail, setEditEmail] = useState("");
+  const [editName, setEditName] = useState("");
+  const [editPassword, setEditPassword] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -82,6 +97,47 @@ export default function UsersTab() {
     );
   });
 
+  const openEdit = (p: Profile) => {
+    setEditing(p);
+    setEditEmail(p.email ?? "");
+    setEditName(p.display_name ?? "");
+    setEditPassword("");
+  };
+
+  const closeEdit = () => {
+    setEditing(null);
+    setEditPassword("");
+  };
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    setSaving(true);
+    const payload: Record<string, unknown> = { user_id: editing.user_id };
+    if (editEmail.trim() && editEmail.trim() !== (editing.email ?? "")) {
+      payload.email = editEmail.trim();
+    }
+    if (editName !== (editing.display_name ?? "")) {
+      payload.display_name = editName;
+    }
+    if (editPassword.length > 0) {
+      payload.password = editPassword;
+    }
+
+    const { data, error } = await supabase.functions.invoke("admin-update-user", {
+      body: payload,
+    });
+    setSaving(false);
+
+    if (error || (data && (data as { error?: string }).error)) {
+      const msg = (data as { error?: string })?.error ?? error?.message ?? "Napaka";
+      toast({ title: "Napaka pri shranjevanju", description: msg, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Shranjeno", description: "Podatki uporabnika so posodobljeni." });
+    closeEdit();
+    load();
+  };
+
   return (
     <div className="space-y-4">
       <Input
@@ -98,19 +154,20 @@ export default function UsersTab() {
               <TableHead>E-pošta</TableHead>
               <TableHead>Ime</TableHead>
               <TableHead className="text-center">Vloga</TableHead>
-              <TableHead className="text-right w-[140px]">Admin</TableHead>
+              <TableHead className="text-center w-[100px]">Admin</TableHead>
+              <TableHead className="text-right w-[100px]">Uredi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                   Nalagam...
                 </TableCell>
               </TableRow>
             ) : visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                   Ni uporabnikov
                 </TableCell>
               </TableRow>
@@ -130,8 +187,8 @@ export default function UsersTab() {
                         {admin ? "admin" : "user"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-2">
                         <Label htmlFor={`adm-${p.user_id}`} className="sr-only">
                           Admin pravice
                         </Label>
@@ -142,6 +199,16 @@ export default function UsersTab() {
                           onCheckedChange={(checked) => toggleAdmin(p.user_id, checked)}
                         />
                       </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => openEdit(p)}
+                        aria-label="Uredi uporabnika"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -186,6 +253,14 @@ export default function UsersTab() {
                       disabled={pendingId === p.user_id}
                       onCheckedChange={(checked) => toggleAdmin(p.user_id, checked)}
                     />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="mt-2"
+                      onClick={() => openEdit(p)}
+                    >
+                      <Pencil className="h-3 w-3 mr-1" /> Uredi
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -193,6 +268,55 @@ export default function UsersTab() {
           })
         )}
       </div>
+
+      <Dialog open={!!editing} onOpenChange={(o) => !o && closeEdit()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Uredi uporabnika</DialogTitle>
+            <DialogDescription>
+              Spremeni e-pošto, ime ali geslo. Geslo pusti prazno, če ga ne želiš spremeniti.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-email">E-pošta</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-name">Ime / prikazno ime</Label>
+              <Input
+                id="edit-name"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-pass">Novo geslo</Label>
+              <Input
+                id="edit-pass"
+                type="password"
+                placeholder="Pusti prazno za nespremenjeno"
+                value={editPassword}
+                onChange={(e) => setEditPassword(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">Najmanj 6 znakov.</p>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={closeEdit} disabled={saving}>
+              Prekliči
+            </Button>
+            <Button onClick={saveEdit} disabled={saving}>
+              {saving ? "Shranjujem..." : "Shrani"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
