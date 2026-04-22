@@ -214,6 +214,7 @@ export default function EvidencaAktivnostiApp() {
             {saving ? "Shranjujem..." : "Shrani zapis"}
           </Button>
         </form>
+        )}
       </div>
     </AppShell>
   );
