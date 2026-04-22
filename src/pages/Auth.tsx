@@ -5,7 +5,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 
 export default function Auth() {
@@ -31,23 +30,6 @@ export default function Auth() {
     }
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: `${window.location.origin}/` },
-    });
-    setBusy(false);
-    if (error) {
-      toast({ title: "Napaka pri registraciji", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Račun ustvarjen", description: "Sedaj ste prijavljeni." });
-      navigate("/", { replace: true });
-    }
-  };
-
   return (
     <main className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-6">
@@ -57,47 +39,22 @@ export default function Auth() {
         </div>
 
         <div className="bg-card border border-border rounded-2xl shadow-sm p-6">
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid grid-cols-2 w-full mb-4">
-              <TabsTrigger value="signin">Prijava</TabsTrigger>
-              <TabsTrigger value="signup">Registracija</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="email-in">E-pošta</Label>
-                  <Input id="email-in" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="pass-in">Geslo</Label>
-                  <Input id="pass-in" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-                <Button type="submit" className="w-full" disabled={busy}>
-                  {busy ? "Prijavljam..." : "Prijava"}
-                </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="email-up">E-pošta</Label>
-                  <Input id="email-up" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="pass-up">Geslo</Label>
-                  <Input id="pass-up" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-                <Button type="submit" className="w-full" disabled={busy}>
-                  {busy ? "Ustvarjam..." : "Ustvari račun"}
-                </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  Prvi registriran uporabnik samodejno postane <strong>admin</strong>.
-                </p>
-              </form>
-            </TabsContent>
-          </Tabs>
+          <form onSubmit={handleSignIn} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="email-in">E-pošta</Label>
+              <Input id="email-in" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pass-in">Geslo</Label>
+              <Input id="pass-in" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            </div>
+            <Button type="submit" className="w-full" disabled={busy}>
+              {busy ? "Prijavljam..." : "Prijava"}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Za nov račun se obrnite na administratorja.
+            </p>
+          </form>
         </div>
 
         <p className="text-center text-xs text-muted-foreground">
