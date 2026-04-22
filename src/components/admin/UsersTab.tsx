@@ -191,19 +191,22 @@ export default function UsersTab() {
               <TableHead>Ime</TableHead>
               <TableHead className="text-center">Vloga</TableHead>
               <TableHead className="text-center w-[100px]">Admin</TableHead>
+              {MODULES.map((m) => (
+                <TableHead key={m.key} className="text-center w-[110px]">{m.label}</TableHead>
+              ))}
               <TableHead className="text-right w-[100px]">Uredi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={5 + MODULES.length} className="text-center text-muted-foreground py-8">
                   Nalagam...
                 </TableCell>
               </TableRow>
             ) : visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={5 + MODULES.length} className="text-center text-muted-foreground py-8">
                   Ni uporabnikov
                 </TableCell>
               </TableRow>
@@ -236,6 +239,19 @@ export default function UsersTab() {
                         />
                       </div>
                     </TableCell>
+                    {MODULES.map((m) => {
+                      const enabled = admin || hasPerm(p.user_id, m.key);
+                      return (
+                        <TableCell key={m.key} className="text-center">
+                          <Switch
+                            checked={enabled}
+                            disabled={admin || permPending === `${p.user_id}-${m.key}`}
+                            onCheckedChange={(c) => togglePerm(p.user_id, m.key, c)}
+                            aria-label={`Urejanje: ${m.label}`}
+                          />
+                        </TableCell>
+                      );
+                    })}
                     <TableCell className="text-right">
                       <Button
                         size="icon"
@@ -298,6 +314,22 @@ export default function UsersTab() {
                       <Pencil className="h-3 w-3 mr-1" /> Uredi
                     </Button>
                   </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-border space-y-2">
+                  <p className="text-xs text-muted-foreground font-medium">Pravice urejanja:</p>
+                  {MODULES.map((m) => {
+                    const enabled = admin || hasPerm(p.user_id, m.key);
+                    return (
+                      <div key={m.key} className="flex items-center justify-between">
+                        <Label className="text-sm">{m.label}</Label>
+                        <Switch
+                          checked={enabled}
+                          disabled={admin || permPending === `${p.user_id}-${m.key}`}
+                          onCheckedChange={(c) => togglePerm(p.user_id, m.key, c)}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
