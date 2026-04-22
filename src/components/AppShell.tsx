@@ -35,8 +35,8 @@ type SidebarItem = { icon: LucideIcon; label: string; to?: string };
 
 const sidebarItems: SidebarItem[] = [
   { icon: AlertCircle, label: "DOGODEK VEČJEGA OBSEGA" },
-  { icon: ClipboardList, label: "POROČILO O INTERVENCIJI" },
-  { icon: Archive, label: "ARHIV INTERVENCIJ" },
+  { icon: ClipboardList, label: "POROČILO O INTERVENCIJI", to: "/intervencija" },
+  { icon: Archive, label: "ARHIV INTERVENCIJ", to: "/arhiv-intervencij" },
   { icon: Truck, label: "POTNI NALOG" },
   { icon: Wrench, label: "PREGLED SERVISOV" },
   { icon: PencilLine, label: "VNOS AKTIVNOSTI", to: "/aktivnost" },
