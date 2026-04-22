@@ -85,6 +85,127 @@ export type Database = {
           },
         ]
       }
+      intervention_attendees: {
+        Row: {
+          created_at: string
+          id: string
+          intervention_id: string
+          person_name: string
+          prisoten: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intervention_id: string
+          person_name: string
+          prisoten?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intervention_id?: string
+          person_name?: string
+          prisoten?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intervention_attendees_intervention_id_fkey"
+            columns: ["intervention_id"]
+            isOneToOne: false
+            referencedRelation: "interventions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      intervention_vehicles: {
+        Row: {
+          created_at: string
+          id: string
+          intervention_id: string
+          klicni_znak: string | null
+          tip_vozila: string
+          uporabljeno: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intervention_id: string
+          klicni_znak?: string | null
+          tip_vozila: string
+          uporabljeno?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intervention_id?: string
+          klicni_znak?: string | null
+          tip_vozila?: string
+          uporabljeno?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intervention_vehicles_intervention_id_fkey"
+            columns: ["intervention_id"]
+            isOneToOne: false
+            referencedRelation: "interventions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interventions: {
+        Row: {
+          cas_polne_ure: string | null
+          created_at: string
+          datum: string
+          id: string
+          naziv: string
+          obcina: string
+          obcina_drugo: string | null
+          opombe: string | null
+          skupina: string
+          stevilka: string | null
+          trajanje_do: string
+          trajanje_od: string
+          updated_at: string
+          user_id: string
+          vodja: string
+        }
+        Insert: {
+          cas_polne_ure?: string | null
+          created_at?: string
+          datum: string
+          id?: string
+          naziv: string
+          obcina?: string
+          obcina_drugo?: string | null
+          opombe?: string | null
+          skupina?: string
+          stevilka?: string | null
+          trajanje_do: string
+          trajanje_od: string
+          updated_at?: string
+          user_id: string
+          vodja: string
+        }
+        Update: {
+          cas_polne_ure?: string | null
+          created_at?: string
+          datum?: string
+          id?: string
+          naziv?: string
+          obcina?: string
+          obcina_drugo?: string | null
+          opombe?: string | null
+          skupina?: string
+          stevilka?: string | null
+          trajanje_do?: string
+          trajanje_od?: string
+          updated_at?: string
+          user_id?: string
+          vodja?: string
+        }
+        Relationships: []
+      }
       members: {
         Row: {
           created_at: string
