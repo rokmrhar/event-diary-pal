@@ -283,6 +283,7 @@ export default function EvidencaIntervencijApp() {
             {saving ? "Shranjujem..." : "Shrani intervencijo"}
           </Button>
         </form>
+        )}
       </div>
     </AppShell>
   );
