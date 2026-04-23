@@ -300,9 +300,7 @@ export default function Dashboard() {
                 <Activity className="h-10 w-10 mx-auto text-muted-foreground/40 mb-2" />
                 <p className="text-sm text-muted-foreground">Še ni vnosov.</p>
                 <Button asChild className="mt-4 bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
-                  <Link to="/aktivnost">
-                    <Plus className="h-4 w-4 mr-1" /> Dodaj prvi vnos
-                  </Link>
+                  <Link to="/aktivnost">Dodaj prvi vnos</Link>
                 </Button>
               </div>
             ) : (
