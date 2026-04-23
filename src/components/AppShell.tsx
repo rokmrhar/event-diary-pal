@@ -42,7 +42,7 @@ const sidebarItems: SidebarItem[] = [
   { icon: Wrench, label: "PREGLED SERVISOV" },
   { icon: Stethoscope, label: "ZDRAVNIŠKI PREGLEDI" },
   { icon: Flame, label: "POŽARNE STRAŽE" },
-  { icon: ShieldCheck, label: "EVIDENCA IDA" },
+  { icon: ShieldCheck, label: "EVIDENCA IDA", to: "/ida" },
   { icon: BarChart3, label: "STATISTIKA" },
   { icon: Biohazard, label: "EVIDENCA PRALNI STROJ" },
 ];
