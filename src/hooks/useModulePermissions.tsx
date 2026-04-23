@@ -6,6 +6,7 @@ export const MODULES = [
   { key: "activities", label: "Aktivnosti" },
   { key: "interventions", label: "Intervencije" },
   { key: "ida", label: "IDA" },
+  { key: "mass_events", label: "Dogodek večjega obsega" },
 ] as const;
 
 export type ModuleKey = (typeof MODULES)[number]["key"];
