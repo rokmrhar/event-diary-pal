@@ -83,7 +83,7 @@ export default function AppShell({ children }: AppShellProps) {
           <div className="flex items-center gap-1 ml-1">
             <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-semibold">ask</div>
             <a href="https://web.emergencyassist.net" target="_blank" rel="noopener noreferrer" aria-label="ASK Sistem" title="ASK Sistem" className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center overflow-hidden transition-all duration-200 hover:bg-white/20 hover:scale-110 hover:shadow-md active:scale-95">
-              <img src="/ask.png" alt="ASK" className="h-5 w-5 object-contain" />
+              <img src="/ask.png" alt="ASK" className="h-full w-full object-cover p-1" />
             </a>
             <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-semibold">oin</div>
             <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-semibold">ulk</div>
