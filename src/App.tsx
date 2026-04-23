@@ -10,6 +10,11 @@ import Admin from "./pages/Admin.tsx";
 import Aktivnost from "./pages/Aktivnost.tsx";
 import Intervencija from "./pages/Intervencija.tsx";
 import ArhivIntervencij from "./pages/ArhivIntervencij.tsx";
+import Ida from "./pages/Ida.tsx";
+import IdaMaske from "./pages/ida/IdaMaske.tsx";
+import IdaHrbtisca from "./pages/ida/IdaHrbtisca.tsx";
+import IdaTlacnePosode from "./pages/ida/IdaTlacnePosode.tsx";
+import IdaPljucniAvtomati from "./pages/ida/IdaPljucniAvtomati.tsx";
 import { AuthProvider } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -28,6 +33,11 @@ const App = () => (
             <Route path="/aktivnost" element={<Aktivnost />} />
             <Route path="/intervencija" element={<Intervencija />} />
             <Route path="/arhiv-intervencij" element={<ArhivIntervencij />} />
+            <Route path="/ida" element={<Ida />} />
+            <Route path="/ida/maske" element={<IdaMaske />} />
+            <Route path="/ida/hrbtisca" element={<IdaHrbtisca />} />
+            <Route path="/ida/tlacne-posode" element={<IdaTlacnePosode />} />
+            <Route path="/ida/pljucni-avtomati" element={<IdaPljucniAvtomati />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
