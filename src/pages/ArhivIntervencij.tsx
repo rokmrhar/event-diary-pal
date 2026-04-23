@@ -7,13 +7,22 @@ import AppShell from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Trash2, Calendar, MapPin, Clock, User, Users, Truck } from "lucide-react";
+import { Trash2, Calendar, MapPin, Clock, User, Users, Truck, Pencil } from "lucide-react";
 
 type InterventionRow = {
   id: string;
@@ -44,6 +53,20 @@ const ArhivIntervencij = () => {
   const [vehicles, setVehicles] = useState<VehicleRow[]>([]);
   const [search, setSearch] = useState("");
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState<InterventionRow | null>(null);
+  const [editForm, setEditForm] = useState({
+    stevilka: "",
+    naziv: "",
+    datum: "",
+    trajanje_od: "",
+    trajanje_do: "",
+    cas_polne_ure: "",
+    vodja: "",
+    obcina: "",
+    skupina: "",
+    opombe: "",
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
@@ -51,7 +74,7 @@ const ArhivIntervencij = () => {
 
   const load = async () => {
     const [iRes, aRes, vRes] = await Promise.all([
-      supabase.from("interventions").select("*").order("datum", { ascending: false }),
+      supabase.from("interventions").select("*"),
       supabase.from("intervention_attendees").select("intervention_id, person_name"),
       supabase.from("intervention_vehicles").select("intervention_id, tip_vozila, klicni_znak"),
     ]);
@@ -59,7 +82,20 @@ const ArhivIntervencij = () => {
       toast({ title: "Napaka pri nalaganju", description: iRes.error.message, variant: "destructive" });
       return;
     }
-    setInterventions((iRes.data ?? []) as InterventionRow[]);
+    // Sort by intervention number (stevilka) descending — largest first.
+    // Treat numeric-looking strings as numbers; missing values go to the end.
+    const sorted = ((iRes.data ?? []) as InterventionRow[]).slice().sort((a, b) => {
+      const an = a.stevilka ? Number(a.stevilka) : NaN;
+      const bn = b.stevilka ? Number(b.stevilka) : NaN;
+      const aValid = !isNaN(an);
+      const bValid = !isNaN(bn);
+      if (aValid && bValid) return bn - an;
+      if (aValid) return -1;
+      if (bValid) return 1;
+      // Fallback: by date desc
+      return (b.datum ?? "").localeCompare(a.datum ?? "");
+    });
+    setInterventions(sorted);
     setAttendees((aRes.data ?? []) as AttendeeRow[]);
     setVehicles((vRes.data ?? []) as VehicleRow[]);
   };
