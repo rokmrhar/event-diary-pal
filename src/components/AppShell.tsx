@@ -82,6 +82,9 @@ export default function AppShell({ children }: AppShellProps) {
           </Link>
           <div className="flex items-center gap-1 ml-1">
             <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-semibold">ask</div>
+            <a href="https://web.emergencyassist.net" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+              <img src="/public/ask.png" alt="ask" class="h-4 w-4 object-contain">
+            </a>
             <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-semibold">oin</div>
             <div className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-semibold">ulk</div>
           </div>
