@@ -13,8 +13,9 @@ import {
   Activity,
   Users,
   TrendingUp,
-  Plus,
   ArrowRight,
+  AlertCircle,
+  Siren,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -30,6 +31,21 @@ type ActivityRow = {
 };
 
 type AttendeeRow = { activity_id: string; person_name: string };
+type InterventionRow = {
+  id: string;
+  datum: string;
+  naziv: string;
+  skupina: string;
+  stevilka: string | null;
+  vodja: string;
+};
+type MajorEventRow = {
+  id: string;
+  naziv: string;
+  vodja: string | null;
+  delovni_kanali: string | null;
+  opened_at: string;
+};
 
 const ACTIVITY_COLORS: Record<string, string> = {
   VAJE: "bg-blue-500",
@@ -48,12 +64,14 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [activities, setActivities] = useState<ActivityRow[]>([]);
   const [attendees, setAttendees] = useState<AttendeeRow[]>([]);
+  const [interventions, setInterventions] = useState<InterventionRow[]>([]);
+  const [majorEvents, setMajorEvents] = useState<MajorEventRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [actRes, attRes] = await Promise.all([
+      const [actRes, attRes, intRes, meRes] = await Promise.all([
         supabase
           .from("activities")
           .select("id, datum, aktivnost, aktivnost_drugo, zacetek, konec, kraj, opis")
@@ -61,10 +79,22 @@ export default function Dashboard() {
           .order("zacetek", { ascending: false })
           .limit(50),
         supabase.from("activity_attendees").select("activity_id, person_name"),
+        supabase
+          .from("interventions")
+          .select("id, datum, naziv, skupina, stevilka, vodja")
+          .order("datum", { ascending: false })
+          .limit(200),
+        supabase
+          .from("major_events")
+          .select("id, naziv, vodja, delovni_kanali, opened_at")
+          .eq("status", "odprt")
+          .order("opened_at", { ascending: false }),
       ]);
       if (actRes.error) toast({ title: "Napaka", description: actRes.error.message, variant: "destructive" });
       setActivities((actRes.data as ActivityRow[]) ?? []);
       setAttendees((attRes.data as AttendeeRow[]) ?? []);
+      setInterventions((intRes.data as InterventionRow[]) ?? []);
+      setMajorEvents((meRes.data as MajorEventRow[]) ?? []);
       setLoading(false);
     })();
   }, [user]);
@@ -82,6 +112,20 @@ export default function Dashboard() {
     const uniqueAttendees = new Set(attendees.map((a) => a.person_name)).size;
     return { total, counts, last30, uniqueAttendees };
   }, [activities, attendees]);
+
+  const intStats = useMemo(() => {
+    const total = interventions.length;
+    const now = new Date();
+    const monthAgo = new Date(now);
+    monthAgo.setDate(now.getDate() - 30);
+    const last30 = interventions.filter((i) => new Date(i.datum) >= monthAgo).length;
+    const bySkupina: Record<string, number> = {};
+    interventions.forEach((i) => {
+      const k = i.skupina || "VSA";
+      bySkupina[k] = (bySkupina[k] ?? 0) + 1;
+    });
+    return { total, last30, bySkupina, recent: interventions.slice(0, 5) };
+  }, [interventions]);
 
   const recent = activities.slice(0, 8);
   const attendeesByActivity = useMemo(() => {
@@ -103,12 +147,37 @@ export default function Dashboard() {
               Dobrodošel{user?.email ? `, ${user.email.split("@")[0]}` : ""}.
             </p>
           </div>
-          <Button asChild className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
-            <Link to="/aktivnost">
-              <Plus className="h-4 w-4 mr-1" /> Nov vnos
-            </Link>
-          </Button>
         </div>
+
+        {/* Open major events alert */}
+        {majorEvents.length > 0 && (
+          <Card className="border-brand-red bg-brand-red/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2 text-brand-red">
+                <Siren className="h-5 w-5 animate-pulse" />
+                Odprti dogodki večjega obsega ({majorEvents.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {majorEvents.map((m) => (
+                  <li key={m.id} className="flex items-start justify-between gap-3 p-3 rounded-lg bg-card border border-border">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold uppercase text-sm">{m.naziv}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Vodja: {m.vodja || "—"} • Kanali: {m.delovni_kanali || "—"} • Odprt:{" "}
+                        {new Date(m.opened_at).toLocaleString("sl-SI")}
+                      </p>
+                    </div>
+                    <Button asChild size="sm" variant="outline">
+                      <Link to="/vecji-obseg">Odpri <ArrowRight className="h-3 w-3 ml-1" /></Link>
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Stat cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -137,6 +206,59 @@ export default function Dashboard() {
             accent="bg-amber-500"
           />
         </div>
+
+        {/* Intervention stats */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-brand-red" /> Intervencije
+            </CardTitle>
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/arhiv-intervencij">Arhiv <ArrowRight className="h-3 w-3 ml-1" /></Link>
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StatCard icon={<AlertCircle className="h-5 w-5" />} label="Vse intervencije" value={intStats.total} accent="bg-brand-red" />
+              <StatCard icon={<TrendingUp className="h-5 w-5" />} label="Zadnjih 30 dni" value={intStats.last30} accent="bg-orange-500" />
+              <StatCard icon={<Siren className="h-5 w-5" />} label="Odprti V.O." value={majorEvents.length} accent="bg-rose-600" />
+              <StatCard icon={<Users className="h-5 w-5" />} label="Skupin" value={Object.keys(intStats.bySkupina).length} accent="bg-indigo-500" />
+            </div>
+            <div>
+              <p className="text-xs uppercase text-muted-foreground mb-2">Po skupinah</p>
+              <div className="flex flex-wrap gap-2">
+                {Object.keys(intStats.bySkupina).length === 0 && (
+                  <p className="text-sm text-muted-foreground">Ni podatkov.</p>
+                )}
+                {Object.entries(intStats.bySkupina).map(([s, c]) => (
+                  <Badge key={s} variant="outline" className="px-3 py-1.5 text-sm">
+                    Skupina {s} • {c}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            {intStats.recent.length > 0 && (
+              <div>
+                <p className="text-xs uppercase text-muted-foreground mb-2">Zadnjih 5</p>
+                <ul className="divide-y divide-border">
+                  {intStats.recent.map((i) => (
+                    <li key={i.id} className="py-2 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {i.stevilka ? `${i.stevilka} • ` : ""}{i.naziv}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(i.datum)} • Vodja: {i.vodja}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="text-xs">{i.skupina}</Badge>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Counts per type */}
         <Card>
@@ -178,9 +300,7 @@ export default function Dashboard() {
                 <Activity className="h-10 w-10 mx-auto text-muted-foreground/40 mb-2" />
                 <p className="text-sm text-muted-foreground">Še ni vnosov.</p>
                 <Button asChild className="mt-4 bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
-                  <Link to="/aktivnost">
-                    <Plus className="h-4 w-4 mr-1" /> Dodaj prvi vnos
-                  </Link>
+                  <Link to="/aktivnost">Dodaj prvi vnos</Link>
                 </Button>
               </div>
             ) : (

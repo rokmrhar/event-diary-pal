@@ -15,6 +15,8 @@ import IdaMaske from "./pages/ida/IdaMaske.tsx";
 import IdaHrbtisca from "./pages/ida/IdaHrbtisca.tsx";
 import IdaTlacnePosode from "./pages/ida/IdaTlacnePosode.tsx";
 import IdaPljucniAvtomati from "./pages/ida/IdaPljucniAvtomati.tsx";
+import VecjiObseg from "./pages/VecjiObseg.tsx";
+import Statistika from "./pages/Statistika.tsx";
 import { AuthProvider } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,8 @@ const App = () => (
             <Route path="/ida/hrbtisca" element={<IdaHrbtisca />} />
             <Route path="/ida/tlacne-posode" element={<IdaTlacnePosode />} />
             <Route path="/ida/pljucni-avtomati" element={<IdaPljucniAvtomati />} />
+            <Route path="/vecji-obseg" element={<VecjiObseg />} />
+            <Route path="/statistika" element={<Statistika />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

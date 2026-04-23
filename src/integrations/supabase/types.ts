@@ -401,6 +401,110 @@ export type Database = {
         }
         Relationships: []
       }
+      major_event_dogodki: {
+        Row: {
+          created_at: string
+          datum: string
+          id: string
+          intervention_id: string | null
+          lokacija: string | null
+          major_event_id: string
+          naziv: string
+          opis: string | null
+          prisotni: Json
+          updated_at: string
+          ura: string | null
+          user_id: string
+          vodja: string | null
+          vozila: Json
+          vozila_drugo: string | null
+        }
+        Insert: {
+          created_at?: string
+          datum: string
+          id?: string
+          intervention_id?: string | null
+          lokacija?: string | null
+          major_event_id: string
+          naziv: string
+          opis?: string | null
+          prisotni?: Json
+          updated_at?: string
+          ura?: string | null
+          user_id: string
+          vodja?: string | null
+          vozila?: Json
+          vozila_drugo?: string | null
+        }
+        Update: {
+          created_at?: string
+          datum?: string
+          id?: string
+          intervention_id?: string | null
+          lokacija?: string | null
+          major_event_id?: string
+          naziv?: string
+          opis?: string | null
+          prisotni?: Json
+          updated_at?: string
+          ura?: string | null
+          user_id?: string
+          vodja?: string | null
+          vozila?: Json
+          vozila_drugo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "major_event_dogodki_major_event_id_fkey"
+            columns: ["major_event_id"]
+            isOneToOne: false
+            referencedRelation: "major_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      major_events: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          delovni_kanali: string | null
+          id: string
+          naziv: string
+          opened_at: string
+          opombe: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          vodja: string | null
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          delovni_kanali?: string | null
+          id?: string
+          naziv: string
+          opened_at?: string
+          opombe?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          vodja?: string | null
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          delovni_kanali?: string | null
+          id?: string
+          naziv?: string
+          opened_at?: string
+          opombe?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          vodja?: string | null
+        }
+        Relationships: []
+      }
       members: {
         Row: {
           created_at: string
