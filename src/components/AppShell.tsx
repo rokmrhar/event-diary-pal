@@ -101,8 +101,8 @@ export default function AppShell({ children }: AppShellProps) {
         </div>
 
         {/* Title */}
-        <div className="px-4 pt-5 pb-3">
-          <h2 className="text-sm font-bold tracking-wide">PGD ŠEMPETER PRI GORICI</h2>
+        <div className="px-4 pt-5 pb-3 flex justify-center">
+          <h2 className="text-sm font-bold tracking-wide text-center"> PGD ŠEMPETER PRI GORICI </h2>
         </div>
 
         {/* Section label */}
