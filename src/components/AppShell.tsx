@@ -95,7 +95,7 @@ export default function AppShell({ children }: AppShellProps) {
 
         {/* Logo placeholder */}
         <div className="flex items-center justify-center py-6 border-b border-white/10">
-          <div className="h-32 w-32 rounded-full bg-brand-red flex items-center justify-center shadow-md overflow-hidden">
+          <div className="h-36 w-36 rounded-full bg-brand-red flex items-center justify-center shadow-md overflow-hidden">
           <img src="/operativa_logo_vektor.png" alt="Logo" className="h-full w-full object-cover" />
           </div>
         </div>
