@@ -130,6 +130,50 @@ const ArhivIntervencij = () => {
     load();
   };
 
+  const openEdit = (i: InterventionRow) => {
+    setEditing(i);
+    setEditForm({
+      stevilka: i.stevilka ?? "",
+      naziv: i.naziv,
+      datum: i.datum,
+      trajanje_od: i.trajanje_od?.slice(0, 5) ?? "",
+      trajanje_do: i.trajanje_do?.slice(0, 5) ?? "",
+      cas_polne_ure: i.cas_polne_ure ?? "",
+      vodja: i.vodja,
+      obcina: i.obcina,
+      skupina: i.skupina,
+      opombe: i.opombe ?? "",
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    setSavingEdit(true);
+    const { error } = await supabase
+      .from("interventions")
+      .update({
+        stevilka: editForm.stevilka.trim() || null,
+        naziv: editForm.naziv.trim(),
+        datum: editForm.datum,
+        trajanje_od: editForm.trajanje_od,
+        trajanje_do: editForm.trajanje_do,
+        cas_polne_ure: editForm.cas_polne_ure.trim() || null,
+        vodja: editForm.vodja.trim(),
+        obcina: editForm.obcina.trim(),
+        skupina: editForm.skupina.trim(),
+        opombe: editForm.opombe.trim() || null,
+      })
+      .eq("id", editing.id);
+    setSavingEdit(false);
+    if (error) {
+      toast({ title: "Napaka pri shranjevanju", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Intervencija posodobljena" });
+    setEditing(null);
+    load();
+  };
+
   if (loading || !user) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-background">
