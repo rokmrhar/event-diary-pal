@@ -304,6 +304,14 @@ const ArhivIntervencij = () => {
                     {canDelete && (
                       <div className="flex justify-end pt-2">
                         <Button
+                          variant="outline"
+                          size="sm"
+                          className="mr-2"
+                          onClick={() => openEdit(i)}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" /> Uredi
+                        </Button>
+                        <Button
                           variant="destructive"
                           size="sm"
                           disabled={busy}
@@ -319,6 +327,62 @@ const ArhivIntervencij = () => {
             })}
           </Accordion>
         )}
+
+        <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Uredi intervencijo</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-stevilka">Številka</Label>
+                <Input id="ed-stevilka" value={editForm.stevilka} onChange={(e) => setEditForm((p) => ({ ...p, stevilka: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-skupina">Skupina</Label>
+                <Input id="ed-skupina" value={editForm.skupina} onChange={(e) => setEditForm((p) => ({ ...p, skupina: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="ed-naziv">Naziv</Label>
+                <Input id="ed-naziv" value={editForm.naziv} onChange={(e) => setEditForm((p) => ({ ...p, naziv: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-datum">Datum</Label>
+                <Input id="ed-datum" type="date" value={editForm.datum} onChange={(e) => setEditForm((p) => ({ ...p, datum: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-cas">Čas (h)</Label>
+                <Input id="ed-cas" value={editForm.cas_polne_ure} onChange={(e) => setEditForm((p) => ({ ...p, cas_polne_ure: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-od">Trajanje od</Label>
+                <Input id="ed-od" type="time" value={editForm.trajanje_od} onChange={(e) => setEditForm((p) => ({ ...p, trajanje_od: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-do">Trajanje do</Label>
+                <Input id="ed-do" type="time" value={editForm.trajanje_do} onChange={(e) => setEditForm((p) => ({ ...p, trajanje_do: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-vodja">Vodja</Label>
+                <Input id="ed-vodja" value={editForm.vodja} onChange={(e) => setEditForm((p) => ({ ...p, vodja: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-obcina">Občina</Label>
+                <Input id="ed-obcina" value={editForm.obcina} onChange={(e) => setEditForm((p) => ({ ...p, obcina: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="ed-opombe">Opombe</Label>
+                <Textarea id="ed-opombe" rows={3} value={editForm.opombe} onChange={(e) => setEditForm((p) => ({ ...p, opombe: e.target.value }))} />
+              </div>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setEditing(null)} disabled={savingEdit}>Prekliči</Button>
+              <Button onClick={saveEdit} disabled={savingEdit}>
+                {savingEdit ? "Shranjujem..." : "Shrani"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppShell>
   );
