@@ -81,13 +81,13 @@ export default function AppShell({ children }: AppShellProps) {
             <Home className="h-5 w-5" />
           </Link>
           <div className="flex items-center gap-1 ml-1">
-            <a href="https://web.emergencyassist.net" target="_blank" rel="noopener noreferrer" aria-label="ASK Sistem" title="ASK Sistem" className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center overflow-hidden transition-all duration-200 hover:bg-white/20 hover:scale-110 hover:shadow-md active:scale-95">
+            <a href="https://web.emergencyassist.net" target="_blank" rel="noopener noreferrer" aria-label="ASK Sistem" title="ASK Sistem" className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden transition-all duration-200 hover:bg-white/20 hover:scale-110 hover:shadow-md active:scale-95">
               <img src="/ask.png" alt="ASK" className="h-full w-full object-cover p-1" />
             </a>
-            <a href="https://apl.gasilec.net/vulkan/login" target="_blank" rel="noopener noreferrer" aria-label="Vulkan" title="Vulkan" className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center overflow-hidden transition-all duration-200 hover:bg-white/20 hover:scale-110 hover:shadow-md active:scale-95">
+            <a href="https://apl.gasilec.net/vulkan/login" target="_blank" rel="noopener noreferrer" aria-label="Vulkan" title="Vulkan" className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden transition-all duration-200 hover:bg-white/20 hover:scale-110 hover:shadow-md active:scale-95">
               <img src="/vulkan.png" alt="Vulkan" className="h-full w-full object-cover p-1" />
             </a>
-            <a href="https://spin3.sos112.si/login" target="_blank" rel="noopener noreferrer" aria-label="SPIN" title="spin" className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center overflow-hidden transition-all duration-200 hover:bg-white/20 hover:scale-110 hover:shadow-md active:scale-95">
+            <a href="https://spin3.sos112.si/login" target="_blank" rel="noopener noreferrer" aria-label="SPIN" title="spin" className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden transition-all duration-200 hover:bg-white/20 hover:scale-110 hover:shadow-md active:scale-95">
               <img src="/spin.png" alt="spin" className="h-full w-full object-cover p-1" />
             </a>
           </div>
