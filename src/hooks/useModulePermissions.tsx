@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 export const MODULES = [
   { key: "activities", label: "Aktivnosti" },
   { key: "interventions", label: "Intervencije" },
+  { key: "ida", label: "IDA" },
 ] as const;
 
 export type ModuleKey = (typeof MODULES)[number]["key"];

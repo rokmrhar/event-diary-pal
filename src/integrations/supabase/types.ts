@@ -85,6 +85,201 @@ export type Database = {
           },
         ]
       }
+      ida_hrbtisca: {
+        Row: {
+          created_at: string
+          datum_pregleda: string | null
+          id: string
+          interna_st: string
+          leto_izdelave: number | null
+          lokacija: string | null
+          model: string | null
+          opombe: string | null
+          serijska_st: string | null
+          updated_at: string
+          user_id: string
+          znamka: string | null
+        }
+        Insert: {
+          created_at?: string
+          datum_pregleda?: string | null
+          id?: string
+          interna_st: string
+          leto_izdelave?: number | null
+          lokacija?: string | null
+          model?: string | null
+          opombe?: string | null
+          serijska_st?: string | null
+          updated_at?: string
+          user_id: string
+          znamka?: string | null
+        }
+        Update: {
+          created_at?: string
+          datum_pregleda?: string | null
+          id?: string
+          interna_st?: string
+          leto_izdelave?: number | null
+          lokacija?: string | null
+          model?: string | null
+          opombe?: string | null
+          serijska_st?: string | null
+          updated_at?: string
+          user_id?: string
+          znamka?: string | null
+        }
+        Relationships: []
+      }
+      ida_maske: {
+        Row: {
+          created_at: string
+          datum_menjave_membrane: string | null
+          datum_menjave_ventila: string | null
+          datum_veljavnosti_pregleda: string | null
+          datum_zadnjega_pregleda: string | null
+          id: string
+          interna_st: string
+          leto_izdelave: number | null
+          model: string | null
+          opombe: string | null
+          proizvajalec: string | null
+          serijska_st: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          datum_menjave_membrane?: string | null
+          datum_menjave_ventila?: string | null
+          datum_veljavnosti_pregleda?: string | null
+          datum_zadnjega_pregleda?: string | null
+          id?: string
+          interna_st: string
+          leto_izdelave?: number | null
+          model?: string | null
+          opombe?: string | null
+          proizvajalec?: string | null
+          serijska_st?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          datum_menjave_membrane?: string | null
+          datum_menjave_ventila?: string | null
+          datum_veljavnosti_pregleda?: string | null
+          datum_zadnjega_pregleda?: string | null
+          id?: string
+          interna_st?: string
+          leto_izdelave?: number | null
+          model?: string | null
+          opombe?: string | null
+          proizvajalec?: string | null
+          serijska_st?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ida_pljucni_avtomati: {
+        Row: {
+          created_at: string
+          datum_veljavnosti_pregleda: string | null
+          datum_zadnjega_pregleda: string | null
+          id: string
+          leto_izdelave: number | null
+          lokacija: string | null
+          naziv: string | null
+          opombe: string | null
+          serijska_st: string | null
+          tip: string | null
+          updated_at: string
+          user_id: string
+          znamka: string | null
+        }
+        Insert: {
+          created_at?: string
+          datum_veljavnosti_pregleda?: string | null
+          datum_zadnjega_pregleda?: string | null
+          id?: string
+          leto_izdelave?: number | null
+          lokacija?: string | null
+          naziv?: string | null
+          opombe?: string | null
+          serijska_st?: string | null
+          tip?: string | null
+          updated_at?: string
+          user_id: string
+          znamka?: string | null
+        }
+        Update: {
+          created_at?: string
+          datum_veljavnosti_pregleda?: string | null
+          datum_zadnjega_pregleda?: string | null
+          id?: string
+          leto_izdelave?: number | null
+          lokacija?: string | null
+          naziv?: string | null
+          opombe?: string | null
+          serijska_st?: string | null
+          tip?: string | null
+          updated_at?: string
+          user_id?: string
+          znamka?: string | null
+        }
+        Relationships: []
+      }
+      ida_tlacne_posode: {
+        Row: {
+          created_at: string
+          datum_veljavnosti_pregleda: string | null
+          datum_zadnjega_pregleda: string | null
+          id: string
+          interna_st: string
+          kapaciteta_l: number | null
+          leto_proizvodnje: number | null
+          opombe: string | null
+          proizvajalec: string | null
+          serijska_st: string | null
+          tlak_bar: number | null
+          updated_at: string
+          user_id: string
+          vrsta: string | null
+        }
+        Insert: {
+          created_at?: string
+          datum_veljavnosti_pregleda?: string | null
+          datum_zadnjega_pregleda?: string | null
+          id?: string
+          interna_st: string
+          kapaciteta_l?: number | null
+          leto_proizvodnje?: number | null
+          opombe?: string | null
+          proizvajalec?: string | null
+          serijska_st?: string | null
+          tlak_bar?: number | null
+          updated_at?: string
+          user_id: string
+          vrsta?: string | null
+        }
+        Update: {
+          created_at?: string
+          datum_veljavnosti_pregleda?: string | null
+          datum_zadnjega_pregleda?: string | null
+          id?: string
+          interna_st?: string
+          kapaciteta_l?: number | null
+          leto_proizvodnje?: number | null
+          opombe?: string | null
+          proizvajalec?: string | null
+          serijska_st?: string | null
+          tlak_bar?: number | null
+          updated_at?: string
+          user_id?: string
+          vrsta?: string | null
+        }
+        Relationships: []
+      }
       intervention_attendees: {
         Row: {
           created_at: string
