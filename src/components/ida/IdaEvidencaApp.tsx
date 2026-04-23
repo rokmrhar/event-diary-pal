@@ -156,7 +156,7 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey }: Ida
 
     setSaving(true);
     if (editing) {
-      const { error } = await supabase.from(table).update(payload).eq("id", editing.id);
+      const { error } = await supabase.from(table).update(payload as never).eq("id", editing.id);
       setSaving(false);
       if (error) {
         toast({ title: "Napaka", description: error.message, variant: "destructive" });
@@ -165,7 +165,7 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey }: Ida
       toast({ title: "Posodobljeno" });
     } else {
       payload.user_id = user.id;
-      const { error } = await supabase.from(table).insert(payload);
+      const { error } = await supabase.from(table).insert(payload as never);
       setSaving(false);
       if (error) {
         toast({ title: "Napaka", description: error.message, variant: "destructive" });
