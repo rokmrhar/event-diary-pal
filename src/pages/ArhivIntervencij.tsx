@@ -7,13 +7,22 @@ import AppShell from "@/components/AppShell";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Trash2, Calendar, MapPin, Clock, User, Users, Truck } from "lucide-react";
+import { Trash2, Calendar, MapPin, Clock, User, Users, Truck, Pencil } from "lucide-react";
 
 type InterventionRow = {
   id: string;
@@ -44,6 +53,20 @@ const ArhivIntervencij = () => {
   const [vehicles, setVehicles] = useState<VehicleRow[]>([]);
   const [search, setSearch] = useState("");
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState<InterventionRow | null>(null);
+  const [editForm, setEditForm] = useState({
+    stevilka: "",
+    naziv: "",
+    datum: "",
+    trajanje_od: "",
+    trajanje_do: "",
+    cas_polne_ure: "",
+    vodja: "",
+    obcina: "",
+    skupina: "",
+    opombe: "",
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth", { replace: true });
@@ -51,7 +74,7 @@ const ArhivIntervencij = () => {
 
   const load = async () => {
     const [iRes, aRes, vRes] = await Promise.all([
-      supabase.from("interventions").select("*").order("datum", { ascending: false }),
+      supabase.from("interventions").select("*"),
       supabase.from("intervention_attendees").select("intervention_id, person_name"),
       supabase.from("intervention_vehicles").select("intervention_id, tip_vozila, klicni_znak"),
     ]);
@@ -59,7 +82,20 @@ const ArhivIntervencij = () => {
       toast({ title: "Napaka pri nalaganju", description: iRes.error.message, variant: "destructive" });
       return;
     }
-    setInterventions((iRes.data ?? []) as InterventionRow[]);
+    // Sort by intervention number (stevilka) descending — largest first.
+    // Treat numeric-looking strings as numbers; missing values go to the end.
+    const sorted = ((iRes.data ?? []) as InterventionRow[]).slice().sort((a, b) => {
+      const an = a.stevilka ? Number(a.stevilka) : NaN;
+      const bn = b.stevilka ? Number(b.stevilka) : NaN;
+      const aValid = !isNaN(an);
+      const bValid = !isNaN(bn);
+      if (aValid && bValid) return bn - an;
+      if (aValid) return -1;
+      if (bValid) return 1;
+      // Fallback: by date desc
+      return (b.datum ?? "").localeCompare(a.datum ?? "");
+    });
+    setInterventions(sorted);
     setAttendees((aRes.data ?? []) as AttendeeRow[]);
     setVehicles((vRes.data ?? []) as VehicleRow[]);
   };
@@ -91,6 +127,50 @@ const ArhivIntervencij = () => {
       return;
     }
     toast({ title: "Intervencija izbrisana" });
+    load();
+  };
+
+  const openEdit = (i: InterventionRow) => {
+    setEditing(i);
+    setEditForm({
+      stevilka: i.stevilka ?? "",
+      naziv: i.naziv,
+      datum: i.datum,
+      trajanje_od: i.trajanje_od?.slice(0, 5) ?? "",
+      trajanje_do: i.trajanje_do?.slice(0, 5) ?? "",
+      cas_polne_ure: i.cas_polne_ure ?? "",
+      vodja: i.vodja,
+      obcina: i.obcina,
+      skupina: i.skupina,
+      opombe: i.opombe ?? "",
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    setSavingEdit(true);
+    const { error } = await supabase
+      .from("interventions")
+      .update({
+        stevilka: editForm.stevilka.trim() || null,
+        naziv: editForm.naziv.trim(),
+        datum: editForm.datum,
+        trajanje_od: editForm.trajanje_od,
+        trajanje_do: editForm.trajanje_do,
+        cas_polne_ure: editForm.cas_polne_ure.trim() || null,
+        vodja: editForm.vodja.trim(),
+        obcina: editForm.obcina.trim(),
+        skupina: editForm.skupina.trim(),
+        opombe: editForm.opombe.trim() || null,
+      })
+      .eq("id", editing.id);
+    setSavingEdit(false);
+    if (error) {
+      toast({ title: "Napaka pri shranjevanju", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Intervencija posodobljena" });
+    setEditing(null);
     load();
   };
 
@@ -224,6 +304,14 @@ const ArhivIntervencij = () => {
                     {canDelete && (
                       <div className="flex justify-end pt-2">
                         <Button
+                          variant="outline"
+                          size="sm"
+                          className="mr-2"
+                          onClick={() => openEdit(i)}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" /> Uredi
+                        </Button>
+                        <Button
                           variant="destructive"
                           size="sm"
                           disabled={busy}
@@ -239,6 +327,62 @@ const ArhivIntervencij = () => {
             })}
           </Accordion>
         )}
+
+        <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Uredi intervencijo</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-stevilka">Številka</Label>
+                <Input id="ed-stevilka" value={editForm.stevilka} onChange={(e) => setEditForm((p) => ({ ...p, stevilka: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-skupina">Skupina</Label>
+                <Input id="ed-skupina" value={editForm.skupina} onChange={(e) => setEditForm((p) => ({ ...p, skupina: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="ed-naziv">Naziv</Label>
+                <Input id="ed-naziv" value={editForm.naziv} onChange={(e) => setEditForm((p) => ({ ...p, naziv: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-datum">Datum</Label>
+                <Input id="ed-datum" type="date" value={editForm.datum} onChange={(e) => setEditForm((p) => ({ ...p, datum: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-cas">Čas (h)</Label>
+                <Input id="ed-cas" value={editForm.cas_polne_ure} onChange={(e) => setEditForm((p) => ({ ...p, cas_polne_ure: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-od">Trajanje od</Label>
+                <Input id="ed-od" type="time" value={editForm.trajanje_od} onChange={(e) => setEditForm((p) => ({ ...p, trajanje_od: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-do">Trajanje do</Label>
+                <Input id="ed-do" type="time" value={editForm.trajanje_do} onChange={(e) => setEditForm((p) => ({ ...p, trajanje_do: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-vodja">Vodja</Label>
+                <Input id="ed-vodja" value={editForm.vodja} onChange={(e) => setEditForm((p) => ({ ...p, vodja: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ed-obcina">Občina</Label>
+                <Input id="ed-obcina" value={editForm.obcina} onChange={(e) => setEditForm((p) => ({ ...p, obcina: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="ed-opombe">Opombe</Label>
+                <Textarea id="ed-opombe" rows={3} value={editForm.opombe} onChange={(e) => setEditForm((p) => ({ ...p, opombe: e.target.value }))} />
+              </div>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setEditing(null)} disabled={savingEdit}>Prekliči</Button>
+              <Button onClick={saveEdit} disabled={savingEdit}>
+                {savingEdit ? "Shranjujem..." : "Shrani"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppShell>
   );
