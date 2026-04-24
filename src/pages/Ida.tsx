@@ -9,7 +9,7 @@ const TILES = [
   { to: "/ida/tlacne-posode", label: "Tlačne posode", icon: Cylinder, desc: "Evidenca tlačnih posod" },
   { to: "/ida/pljucni-avtomati", label: "Pljučni avtomati", icon: Stethoscope, desc: "Evidenca pljučnih avtomatov" },
   { to: "/ida/polnjenja", label: "Polnjenja posod", icon: Gauge, desc: "Evidenca polnjenj tlačnih posod" },
-  { to: "/ida/seznam-vozila", label: "Seznam IDA po vozilih", icon: Gauge, desc: "Seznam IDA po vozilih" },
+  { to: "/ida/seznamida", label: "Seznam IDA po vozilih", icon: Gauge, desc: "Seznam IDA po vozilih" },
 ];
 
 export default function Ida() {
