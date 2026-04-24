@@ -32,6 +32,7 @@ import AppShell from "@/components/AppShell";
 import { useModulePermissions } from "@/hooks/useModulePermissions";
 import { Lock, Pencil, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { formatMonthSI } from "@/lib/format";
 
 export type IdaFieldType = "text" | "number" | "year" | "month" | "select" | "textarea";
 
@@ -50,6 +51,15 @@ interface IdaEvidencaAppProps {
   table: "ida_maske" | "ida_hrbtisca" | "ida_tlacne_posode" | "ida_pljucni_avtomati";
   fields: IdaField[];
   primaryKey: string; // field shown as primary identifier in table
+  /**
+   * Optional extra read-only column rendered after the regular fields
+   * (before the action buttons). Useful e.g. for showing computed
+   * values like the number of cylinder fillings.
+   */
+  extraColumn?: {
+    label: string;
+    render: (row: Row) => React.ReactNode;
+  };
 }
 
 type Row = Record<string, unknown> & { id: string; user_id: string };
@@ -60,7 +70,7 @@ const MONTHS = [
   "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
 ];
 
-export default function IdaEvidencaApp({ title, table, fields, primaryKey }: IdaEvidencaAppProps) {
+export default function IdaEvidencaApp({ title, table, fields, primaryKey, extraColumn }: IdaEvidencaAppProps) {
   const { user } = useAuth();
   const { canEdit } = useModulePermissions();
   const allowed = canEdit("ida");
