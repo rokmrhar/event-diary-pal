@@ -308,7 +308,7 @@ export default function VecjiObseg() {
                       <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1"><UserIcon className="h-3.5 w-3.5" /> Vodja: {ev.vodja || "—"}</span>
                         <span className="flex items-center gap-1"><Radio className="h-3.5 w-3.5" /> Kanali: {ev.delovni_kanali || "—"}</span>
-                        <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {new Date(ev.opened_at).toLocaleString("sl-SI")}</span>
+                        <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {formatDateTimeSI(ev.opened_at)}</span>
                       </div>
                       {ev.opombe && <p className="text-sm mt-2">{ev.opombe}</p>}
                     </div>
@@ -335,7 +335,7 @@ export default function VecjiObseg() {
                           <div className="min-w-0 flex-1">
                             <p className="font-semibold text-sm">{d.naziv}</p>
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              {d.datum} {d.ura ? `• ${d.ura}` : ""} • {d.lokacija || "—"}
+                              {formatDateSI(d.datum)} {d.ura ? `• ${formatTime24(d.ura)}` : ""} • {d.lokacija || "—"}
                             </p>
                             <div className="flex flex-wrap gap-2 mt-2">
                               {d.vodja && <Badge variant="outline" className="text-xs">Vodja: {d.vodja}</Badge>}
@@ -377,9 +377,9 @@ export default function VecjiObseg() {
                 <li key={ev.id} className="border border-border rounded-lg p-3 bg-muted/30 flex items-center justify-between gap-3 flex-wrap">
                   <div>
                     <p className="font-medium uppercase text-sm">{ev.naziv}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Odprt: {new Date(ev.opened_at).toLocaleString("sl-SI")}
-                      {ev.closed_at && ` • Zaključen: ${new Date(ev.closed_at).toLocaleString("sl-SI")}`}
+                  <p className="text-xs text-muted-foreground">
+                      Odprt: {formatDateTimeSI(ev.opened_at)}
+                      {ev.closed_at && ` • Zaključen: ${formatDateTimeSI(ev.closed_at)}`}
                     </p>
                   </div>
                   <Badge variant="outline">{(dogodkiByEvent[ev.id] ?? []).length} dogodkov</Badge>
