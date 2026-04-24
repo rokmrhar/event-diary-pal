@@ -157,6 +157,8 @@ const ArhivIntervencij = () => {
       skupina: i.skupina,
       opombe: i.opombe ?? "",
     });
+    setEditAttendees(attendees.filter((a) => a.intervention_id === i.id).map((a) => a.person_name));
+    setAttSearch("");
   };
 
   const saveEdit = async () => {
@@ -177,15 +179,44 @@ const ArhivIntervencij = () => {
         opombe: editForm.opombe.trim() || null,
       })
       .eq("id", editing.id);
-    setSavingEdit(false);
     if (error) {
+      setSavingEdit(false);
       toast({ title: "Napaka pri shranjevanju", description: error.message, variant: "destructive" });
       return;
     }
+    // Sync attendees: delete existing, insert current selection
+    const { error: delErr } = await supabase
+      .from("intervention_attendees")
+      .delete()
+      .eq("intervention_id", editing.id);
+    if (delErr) {
+      setSavingEdit(false);
+      toast({ title: "Napaka pri prisotnih", description: delErr.message, variant: "destructive" });
+      return;
+    }
+    if (editAttendees.length > 0) {
+      const { error: insErr } = await supabase
+        .from("intervention_attendees")
+        .insert(editAttendees.map((person_name) => ({ intervention_id: editing.id, person_name })));
+      if (insErr) {
+        setSavingEdit(false);
+        toast({ title: "Napaka pri prisotnih", description: insErr.message, variant: "destructive" });
+        return;
+      }
+    }
+    setSavingEdit(false);
     toast({ title: "Intervencija posodobljena" });
     setEditing(null);
     load();
   };
+
+  const toggleEditAttendee = (name: string) =>
+    setEditAttendees((p) => (p.includes(name) ? p.filter((x) => x !== name) : [...p, name]));
+
+  const filteredEditMembers = useMemo(
+    () => members.filter((m) => m.name.toLowerCase().includes(attSearch.toLowerCase())),
+    [members, attSearch]
+  );
 
   if (loading || !user) {
     return (
