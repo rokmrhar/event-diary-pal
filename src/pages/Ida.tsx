@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import AppShell from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
-import { ShieldCheck, Wind, Droplets, Cylinder, Stethoscope } from "lucide-react";
+import { ShieldCheck, Wind, Droplets, Cylinder, Stethoscope, Gauge } from "lucide-react";
 
 const TILES = [
   { to: "/ida/maske", label: "Maske", icon: Wind, desc: "Evidenca obraznih mask" },
   { to: "/ida/hrbtisca", label: "Hrbtišča", icon: Droplets, desc: "Evidenca hrbtišč IDA" },
   { to: "/ida/tlacne-posode", label: "Tlačne posode", icon: Cylinder, desc: "Evidenca tlačnih posod" },
   { to: "/ida/pljucni-avtomati", label: "Pljučni avtomati", icon: Stethoscope, desc: "Evidenca pljučnih avtomatov" },
+  { to: "/ida/polnjenja", label: "Polnjenja posod", icon: Gauge, desc: "Evidenca polnjenj tlačnih posod" },
 ];
 
 export default function Ida() {
