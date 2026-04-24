@@ -58,8 +58,14 @@ export default function AppShell({ children }: AppShellProps) {
     return () => clearInterval(id);
   }, []);
 
-  const dateStr = now.toLocaleDateString("sl-SI");
-  const timeStr = now.toLocaleTimeString("sl-SI", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const dd = String(now.getDate()).padStart(2, "0");
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const yyyy = now.getFullYear();
+  const dateStr = `${dd}.${mm}.${yyyy}`;
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mi = String(now.getMinutes()).padStart(2, "0");
+  const ss = String(now.getSeconds()).padStart(2, "0");
+  const timeStr = `${hh}:${mi}:${ss}`;
 
   return (
     <div className="h-screen flex bg-background overflow-hidden">
