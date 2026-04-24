@@ -25,6 +25,7 @@ import {
 import { Pencil, Trash2 } from "lucide-react";
 import { ACTIVITY_TYPES } from "@/lib/people";
 import { toast } from "@/hooks/use-toast";
+import { formatDateSI, formatTime24 } from "@/lib/format";
 
 type ActivityRow = {
   id: string;
@@ -38,14 +39,8 @@ type ActivityRow = {
 };
 type AttendeeRow = { id: string; person_name: string; activity_id: string };
 
-const formatDate = (iso: string) => {
-  try {
-    return new Date(iso).toLocaleDateString("sl-SI", { day: "2-digit", month: "2-digit", year: "numeric" });
-  } catch {
-    return iso;
-  }
-};
-const formatTime = (t: string) => t?.slice(0, 5) ?? t;
+const formatDate = formatDateSI;
+const formatTime = formatTime24;
 const labelFor = (a: ActivityRow) =>
   a.aktivnost === "DRUGO" && a.aktivnost_drugo ? a.aktivnost_drugo : a.aktivnost;
 
