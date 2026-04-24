@@ -231,7 +231,16 @@ export default function EvidencaIntervencijApp() {
 
           <div className="space-y-1.5">
             <Label htmlFor="vodja">VODJA INTERVENCIJE *</Label>
-            <Input id="vodja" placeholder="Ime in priimek" value={vodja} onChange={(e) => setVodja(e.target.value)} required />
+            <Select value={vodja} onValueChange={setVodja}>
+              <SelectTrigger id="vodja">
+                <SelectValue placeholder="Izberi vodjo" />
+              </SelectTrigger>
+              <SelectContent>
+                {members.map((m) => (
+                  <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
