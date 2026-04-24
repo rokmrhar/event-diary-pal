@@ -9,6 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useMembers } from "@/hooks/useMembers";
+import { formatDateSI, formatTime24 } from "@/lib/format";
 import {
   Dialog,
   DialogContent,
@@ -42,12 +52,13 @@ type InterventionRow = {
 type AttendeeRow = { intervention_id: string; person_name: string };
 type VehicleRow = { intervention_id: string; tip_vozila: string; klicni_znak: string | null };
 
-const formatDate = (iso: string) => new Date(iso).toLocaleDateString("sl-SI");
-const formatTime = (t: string) => t.slice(0, 5);
+const formatDate = formatDateSI;
+const formatTime = formatTime24;
 
 const ArhivIntervencij = () => {
   const { user, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { members } = useMembers();
   const [interventions, setInterventions] = useState<InterventionRow[]>([]);
   const [attendees, setAttendees] = useState<AttendeeRow[]>([]);
   const [vehicles, setVehicles] = useState<VehicleRow[]>([]);
@@ -66,6 +77,8 @@ const ArhivIntervencij = () => {
     skupina: "",
     opombe: "",
   });
+  const [editAttendees, setEditAttendees] = useState<string[]>([]);
+  const [attSearch, setAttSearch] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
