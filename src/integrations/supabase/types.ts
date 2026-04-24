@@ -553,6 +553,47 @@ export type Database = {
         }
         Relationships: []
       }
+      tlacne_posode_polnjenja: {
+        Row: {
+          created_at: string
+          datum: string
+          id: string
+          opombe: string | null
+          polnil: string
+          posoda_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          datum: string
+          id?: string
+          opombe?: string | null
+          polnil: string
+          posoda_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          datum?: string
+          id?: string
+          opombe?: string | null
+          polnil?: string
+          posoda_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tlacne_posode_polnjenja_posoda_id_fkey"
+            columns: ["posoda_id"]
+            isOneToOne: false
+            referencedRelation: "ida_tlacne_posode"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_module_permissions: {
         Row: {
           created_at: string
@@ -592,6 +633,124 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vehicle_inspections: {
+        Row: {
+          created_at: string
+          id: string
+          naslednji_pregled: string | null
+          opombe: string | null
+          updated_at: string
+          user_id: string
+          vehicle_id: string
+          zadnji_pregled: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          naslednji_pregled?: string | null
+          opombe?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_id: string
+          zadnji_pregled?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          naslednji_pregled?: string | null
+          opombe?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_id?: string
+          zadnji_pregled?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_inspections_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_services: {
+        Row: {
+          created_at: string
+          datum: string
+          id: string
+          opis: string
+          updated_at: string
+          user_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          datum: string
+          id?: string
+          opis: string
+          updated_at?: string
+          user_id: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          datum?: string
+          id?: string
+          opis?: string
+          updated_at?: string
+          user_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_services_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicles: {
+        Row: {
+          created_at: string
+          id: string
+          model: string | null
+          opombe: string | null
+          oznaka: string
+          registracija: string | null
+          st_sedezev: number | null
+          updated_at: string
+          user_id: string
+          znamka: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          model?: string | null
+          opombe?: string | null
+          oznaka: string
+          registracija?: string | null
+          st_sedezev?: number | null
+          updated_at?: string
+          user_id: string
+          znamka?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          model?: string | null
+          opombe?: string | null
+          oznaka?: string
+          registracija?: string | null
+          st_sedezev?: number | null
+          updated_at?: string
+          user_id?: string
+          znamka?: string | null
         }
         Relationships: []
       }

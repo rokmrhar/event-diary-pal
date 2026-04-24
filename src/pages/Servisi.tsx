@@ -1,30 +1,26 @@
 import { Link } from "react-router-dom";
 import AppShell from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
-import { ShieldCheck, Wind, Droplets, Cylinder, Stethoscope, Gauge } from "lucide-react";
+import { Wrench, ClipboardCheck } from "lucide-react";
 
 const TILES = [
-  { to: "/ida/maske", label: "Maske", icon: Wind, desc: "Evidenca obraznih mask" },
-  { to: "/ida/hrbtisca", label: "Hrbtišča", icon: Droplets, desc: "Evidenca hrbtišč IDA" },
-  { to: "/ida/tlacne-posode", label: "Tlačne posode", icon: Cylinder, desc: "Evidenca tlačnih posod" },
-  { to: "/ida/pljucni-avtomati", label: "Pljučni avtomati", icon: Stethoscope, desc: "Evidenca pljučnih avtomatov" },
-  { to: "/ida/polnjenja", label: "Polnjenja posod", icon: Gauge, desc: "Evidenca polnjenj tlačnih posod" },
+  { to: "/servisi/knjiga", label: "Knjiga servisov in popravil", icon: Wrench, desc: "Vsi servisi in popravila vozil" },
+  { to: "/servisi/tehnicni-pregledi", label: "Tehnični pregledi", icon: ClipboardCheck, desc: "Datumi tehničnih pregledov vozil" },
 ];
 
-export default function Ida() {
+export default function Servisi() {
   return (
     <AppShell>
-      <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-brand-red flex items-center justify-center text-brand-red-foreground">
-            <ShieldCheck className="h-5 w-5" />
+            <Wrench className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Evidenca IDA</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Pregled servisov</h1>
             <p className="text-sm text-muted-foreground">Izberi evidenco</p>
           </div>
         </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {TILES.map((t) => (
             <Link key={t.to} to={t.to} className="group">

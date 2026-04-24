@@ -39,7 +39,8 @@ const sidebarItems: SidebarItem[] = [
   { icon: Archive, label: "ARHIV INTERVENCIJ", to: "/arhiv-intervencij" },
   { icon: PencilLine, label: "VNOS AKTIVNOSTI", to: "/aktivnost" },
   { icon: Truck, label: "POTNI NALOG" },
-  { icon: Wrench, label: "PREGLED SERVISOV" },
+  { icon: Wrench, label: "PREGLED SERVISOV", to: "/servisi" },
+  { icon: Truck, label: "VOZILA", to: "/vozila" },
   { icon: Stethoscope, label: "ZDRAVNIŠKI PREGLEDI" },
   { icon: Flame, label: "POŽARNE STRAŽE" },
   { icon: ShieldCheck, label: "EVIDENCA IDA", to: "/ida" },
@@ -61,10 +62,10 @@ export default function AppShell({ children }: AppShellProps) {
   const timeStr = now.toLocaleTimeString("sl-SI", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="h-screen flex bg-background overflow-hidden">
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-brand-navy text-brand-navy-foreground flex flex-col transition-transform duration-200 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-brand-navy text-brand-navy-foreground flex flex-col transition-transform duration-200 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -82,13 +83,13 @@ export default function AppShell({ children }: AppShellProps) {
           </Link>
           <div className="flex items-center gap-1 ml-1">
             <a href="https://web.emergencyassist.net" target="_blank" rel="noopener noreferrer" aria-label="ASK Sistem" title="ASK Sistem" className="h-10 w-10 rounded-full bg-white flex items-center justify-center overflow-hidden transition-all duration-200 hover:bg-white/90 hover:scale-110 hover:shadow-md active:scale-95">
-              <img src="/ask.png" alt="ASK" className="h-7 w-7 object-contain" />
+              <img src="/ask.png" alt="ASK" className="h-full w-full object-cover" />
             </a>
             <a href="https://apl.gasilec.net/vulkan/login" target="_blank" rel="noopener noreferrer" aria-label="Vulkan" title="Vulkan" className="h-10 w-10 rounded-full bg-white flex items-center justify-center overflow-hidden transition-all duration-200 hover:bg-white/90 hover:scale-110 hover:shadow-md active:scale-95">
-              <img src="/vulkan.png" alt="Vulkan" className="h-7 w-7 object-contain" />
+              <img src="/vulkan.png" alt="Vulkan" className="h-full w-full object-cover" />
             </a>
             <a href="https://spin3.sos112.si/login" target="_blank" rel="noopener noreferrer" aria-label="SPIN" title="spin" className="h-10 w-10 rounded-full bg-white flex items-center justify-center overflow-hidden transition-all duration-200 hover:bg-white/90 hover:scale-110 hover:shadow-md active:scale-95">
-              <img src="/spin.png" alt="spin" className="h-7 w-7 object-contain" />
+              <img src="/spin.png" alt="spin" className="h-full w-full object-cover" />
             </a>
           </div>
         </div>
@@ -149,9 +150,9 @@ export default function AppShell({ children }: AppShellProps) {
       )}
 
       {/* Main column */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-64 h-screen overflow-hidden">
         {/* Top bar */}
-        <header className="bg-brand-navy text-brand-navy-foreground border-b border-white/10 sticky top-0 z-20">
+        <header className="bg-brand-navy text-brand-navy-foreground border-b border-white/10 z-20 shrink-0">
           <div className="flex items-center justify-between gap-3 px-3 sm:px-6 py-3">
             <div className="flex items-center gap-2">
               <button
@@ -204,7 +205,7 @@ export default function AppShell({ children }: AppShellProps) {
         </header>
 
         {/* Content */}
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>
   );
