@@ -270,6 +270,7 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey, extra
 
   const formatCell = (f: IdaField, v: unknown): string => {
     if (v === null || v === undefined || v === "") return "—";
+    if (f.type === "month") return formatMonthSI(String(v));
     return String(v);
   };
 
