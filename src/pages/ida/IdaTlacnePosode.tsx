@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import IdaEvidencaApp, { IdaField } from "@/components/ida/IdaEvidencaApp";
+import { supabase } from "@/integrations/supabase/client";
 
 const FIELDS: IdaField[] = [
   { key: "interna_st", label: "Interna št.", type: "text", required: true },
@@ -14,12 +16,36 @@ const FIELDS: IdaField[] = [
 ];
 
 export default function IdaTlacnePosode() {
+  const [counts, setCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("tlacne_posode_polnjenja")
+        .select("posoda_id");
+      if (cancelled || !data) return;
+      const map: Record<string, number> = {};
+      for (const r of data as { posoda_id: string }[]) {
+        map[r.posoda_id] = (map[r.posoda_id] ?? 0) + 1;
+      }
+      setCounts(map);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <IdaEvidencaApp
       title="Tlačne posode"
       table="ida_tlacne_posode"
       fields={FIELDS}
       primaryKey="interna_st"
+      extraColumn={{
+        label: "Št. polnjenj",
+        render: (row) => counts[row.id as string] ?? 0,
+      }}
     />
   );
 }
