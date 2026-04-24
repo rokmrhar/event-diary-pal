@@ -18,6 +18,7 @@ import {
   Siren,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { formatDateSI, formatTime24, formatDateTimeSI } from "@/lib/format";
 
 type ActivityRow = {
   id: string;
@@ -54,9 +55,8 @@ const ACTIVITY_COLORS: Record<string, string> = {
   DRUGO: "bg-purple-500",
 };
 
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("sl-SI", { day: "2-digit", month: "2-digit", year: "numeric" });
-const formatTime = (t: string) => (t ? t.slice(0, 5) : "");
+const formatDate = formatDateSI;
+const formatTime = formatTime24;
 const labelFor = (a: ActivityRow) =>
   a.aktivnost === "DRUGO" && a.aktivnost_drugo ? a.aktivnost_drugo : a.aktivnost;
 
@@ -166,7 +166,7 @@ export default function Dashboard() {
                       <p className="font-semibold uppercase text-sm">{m.naziv}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         Vodja: {m.vodja || "—"} • Kanali: {m.delovni_kanali || "—"} • Odprt:{" "}
-                        {new Date(m.opened_at).toLocaleString("sl-SI")}
+                        {formatDateTimeSI(m.opened_at)}
                       </p>
                     </div>
                     <Button asChild size="sm" variant="outline">
