@@ -5,6 +5,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { VEHICLES, SKUPINE } from "@/lib/people";
 import { useMembers } from "@/hooks/useMembers";
@@ -224,7 +231,16 @@ export default function EvidencaIntervencijApp() {
 
           <div className="space-y-1.5">
             <Label htmlFor="vodja">VODJA INTERVENCIJE *</Label>
-            <Input id="vodja" placeholder="Ime in priimek" value={vodja} onChange={(e) => setVodja(e.target.value)} required />
+            <Select value={vodja} onValueChange={setVodja}>
+              <SelectTrigger id="vodja">
+                <SelectValue placeholder="Izberi vodjo" />
+              </SelectTrigger>
+              <SelectContent>
+                {members.map((m) => (
+                  <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

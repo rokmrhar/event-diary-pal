@@ -32,6 +32,7 @@ import AppShell from "@/components/AppShell";
 import { useModulePermissions } from "@/hooks/useModulePermissions";
 import { Lock, Pencil, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { formatMonthSI } from "@/lib/format";
 
 export type IdaFieldType = "text" | "number" | "year" | "month" | "select" | "textarea";
 
@@ -45,14 +46,23 @@ export interface IdaField {
   suffix?: string; // e.g. "L", "bar"
 }
 
+type Row = Record<string, unknown> & { id: string; user_id: string };
+
 interface IdaEvidencaAppProps {
   title: string;
   table: "ida_maske" | "ida_hrbtisca" | "ida_tlacne_posode" | "ida_pljucni_avtomati";
   fields: IdaField[];
   primaryKey: string; // field shown as primary identifier in table
+  /**
+   * Optional extra read-only column rendered after the regular fields
+   * (before the action buttons). Useful e.g. for showing computed
+   * values like the number of cylinder fillings.
+   */
+  extraColumn?: {
+    label: string;
+    render: (row: Row) => React.ReactNode;
+  };
 }
-
-type Row = Record<string, unknown> & { id: string; user_id: string };
 
 const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: 80 }, (_, i) => currentYear - i);
@@ -60,7 +70,7 @@ const MONTHS = [
   "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
 ];
 
-export default function IdaEvidencaApp({ title, table, fields, primaryKey }: IdaEvidencaAppProps) {
+export default function IdaEvidencaApp({ title, table, fields, primaryKey, extraColumn }: IdaEvidencaAppProps) {
   const { user } = useAuth();
   const { canEdit } = useModulePermissions();
   const allowed = canEdit("ida");
@@ -260,6 +270,7 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey }: Ida
 
   const formatCell = (f: IdaField, v: unknown): string => {
     if (v === null || v === undefined || v === "") return "—";
+    if (f.type === "month") return formatMonthSI(String(v));
     return String(v);
   };
 
@@ -302,19 +313,20 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey }: Ida
                     {f.label}
                   </TableHead>
                 ))}
+                {extraColumn && <TableHead className="text-center">{extraColumn.label}</TableHead>}
                 {allowed && <TableHead className="text-right w-[120px]">Akcije</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={fields.length + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={fields.length + (extraColumn ? 1 : 0) + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">
                     Nalagam...
                   </TableCell>
                 </TableRow>
               ) : visible.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={fields.length + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={fields.length + (extraColumn ? 1 : 0) + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">
                     Ni zapisov
                   </TableCell>
                 </TableRow>
@@ -327,6 +339,9 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey }: Ida
                         {f.suffix && r[f.key] !== null && r[f.key] !== undefined && r[f.key] !== "" ? ` ${f.suffix}` : ""}
                       </TableCell>
                     ))}
+                    {extraColumn && (
+                      <TableCell className="text-center font-medium">{extraColumn.render(r)}</TableCell>
+                    )}
                     {allowed && (
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">

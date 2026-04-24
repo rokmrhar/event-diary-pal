@@ -12,6 +12,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -21,6 +28,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { VEHICLES } from "@/lib/people";
 import { Siren, Plus, Lock, CheckCircle2, Trash2, Radio, User as UserIcon, Clock } from "lucide-react";
+import { formatDateSI, formatDateTimeSI, formatTime24 } from "@/lib/format";
 
 type MajorEvent = {
   id: string;
@@ -300,7 +308,7 @@ export default function VecjiObseg() {
                       <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1"><UserIcon className="h-3.5 w-3.5" /> Vodja: {ev.vodja || "—"}</span>
                         <span className="flex items-center gap-1"><Radio className="h-3.5 w-3.5" /> Kanali: {ev.delovni_kanali || "—"}</span>
-                        <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {new Date(ev.opened_at).toLocaleString("sl-SI")}</span>
+                        <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {formatDateTimeSI(ev.opened_at)}</span>
                       </div>
                       {ev.opombe && <p className="text-sm mt-2">{ev.opombe}</p>}
                     </div>
@@ -327,7 +335,7 @@ export default function VecjiObseg() {
                           <div className="min-w-0 flex-1">
                             <p className="font-semibold text-sm">{d.naziv}</p>
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              {d.datum} {d.ura ? `• ${d.ura}` : ""} • {d.lokacija || "—"}
+                              {formatDateSI(d.datum)} {d.ura ? `• ${formatTime24(d.ura)}` : ""} • {d.lokacija || "—"}
                             </p>
                             <div className="flex flex-wrap gap-2 mt-2">
                               {d.vodja && <Badge variant="outline" className="text-xs">Vodja: {d.vodja}</Badge>}
@@ -369,9 +377,9 @@ export default function VecjiObseg() {
                 <li key={ev.id} className="border border-border rounded-lg p-3 bg-muted/30 flex items-center justify-between gap-3 flex-wrap">
                   <div>
                     <p className="font-medium uppercase text-sm">{ev.naziv}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Odprt: {new Date(ev.opened_at).toLocaleString("sl-SI")}
-                      {ev.closed_at && ` • Zaključen: ${new Date(ev.closed_at).toLocaleString("sl-SI")}`}
+                  <p className="text-xs text-muted-foreground">
+                      Odprt: {formatDateTimeSI(ev.opened_at)}
+                      {ev.closed_at && ` • Zaključen: ${formatDateTimeSI(ev.closed_at)}`}
                     </p>
                   </div>
                   <Badge variant="outline">{(dogodkiByEvent[ev.id] ?? []).length} dogodkov</Badge>
@@ -395,7 +403,16 @@ export default function VecjiObseg() {
             </div>
             <div className="space-y-1.5">
               <Label>Vodja intervencije</Label>
-              <Input value={nVodja} onChange={(e) => setNVodja(e.target.value)} />
+              <Select value={nVodja} onValueChange={setNVodja}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Izberi vodjo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Delovni kanali</Label>
@@ -440,7 +457,16 @@ export default function VecjiObseg() {
             </div>
             <div className="space-y-1.5">
               <Label>Vodja dogodka</Label>
-              <Input value={dVodja} onChange={(e) => setDVodja(e.target.value)} placeholder="Ime in priimek" />
+              <Select value={dVodja} onValueChange={setDVodja}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Izberi vodjo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Kratek opis</Label>

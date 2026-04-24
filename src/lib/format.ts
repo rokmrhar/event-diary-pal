@@ -40,3 +40,14 @@ export function formatDateTimeSI(value: string | Date | null | undefined): strin
     return String(value);
   }
 }
+
+/**
+ * Format a YYYY-MM string (HTML month input value) to "mm.yyyy".
+ * Falls back to the original value if it cannot be parsed.
+ */
+export function formatMonthSI(value: string | null | undefined): string {
+  if (!value) return "—";
+  const m = /^(\d{4})-(\d{2})$/.exec(value.trim());
+  if (!m) return value;
+  return `${m[2]}.${m[1]}`;
+}

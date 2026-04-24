@@ -9,6 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useMembers } from "@/hooks/useMembers";
+import { formatDateSI, formatTime24 } from "@/lib/format";
 import {
   Dialog,
   DialogContent,
@@ -42,12 +52,13 @@ type InterventionRow = {
 type AttendeeRow = { intervention_id: string; person_name: string };
 type VehicleRow = { intervention_id: string; tip_vozila: string; klicni_znak: string | null };
 
-const formatDate = (iso: string) => new Date(iso).toLocaleDateString("sl-SI");
-const formatTime = (t: string) => t.slice(0, 5);
+const formatDate = formatDateSI;
+const formatTime = formatTime24;
 
 const ArhivIntervencij = () => {
   const { user, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { members } = useMembers();
   const [interventions, setInterventions] = useState<InterventionRow[]>([]);
   const [attendees, setAttendees] = useState<AttendeeRow[]>([]);
   const [vehicles, setVehicles] = useState<VehicleRow[]>([]);
@@ -66,6 +77,8 @@ const ArhivIntervencij = () => {
     skupina: "",
     opombe: "",
   });
+  const [editAttendees, setEditAttendees] = useState<string[]>([]);
+  const [attSearch, setAttSearch] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
@@ -144,6 +157,8 @@ const ArhivIntervencij = () => {
       skupina: i.skupina,
       opombe: i.opombe ?? "",
     });
+    setEditAttendees(attendees.filter((a) => a.intervention_id === i.id).map((a) => a.person_name));
+    setAttSearch("");
   };
 
   const saveEdit = async () => {
@@ -164,15 +179,44 @@ const ArhivIntervencij = () => {
         opombe: editForm.opombe.trim() || null,
       })
       .eq("id", editing.id);
-    setSavingEdit(false);
     if (error) {
+      setSavingEdit(false);
       toast({ title: "Napaka pri shranjevanju", description: error.message, variant: "destructive" });
       return;
     }
+    // Sync attendees: delete existing, insert current selection
+    const { error: delErr } = await supabase
+      .from("intervention_attendees")
+      .delete()
+      .eq("intervention_id", editing.id);
+    if (delErr) {
+      setSavingEdit(false);
+      toast({ title: "Napaka pri prisotnih", description: delErr.message, variant: "destructive" });
+      return;
+    }
+    if (editAttendees.length > 0) {
+      const { error: insErr } = await supabase
+        .from("intervention_attendees")
+        .insert(editAttendees.map((person_name) => ({ intervention_id: editing.id, person_name })));
+      if (insErr) {
+        setSavingEdit(false);
+        toast({ title: "Napaka pri prisotnih", description: insErr.message, variant: "destructive" });
+        return;
+      }
+    }
+    setSavingEdit(false);
     toast({ title: "Intervencija posodobljena" });
     setEditing(null);
     load();
   };
+
+  const toggleEditAttendee = (name: string) =>
+    setEditAttendees((p) => (p.includes(name) ? p.filter((x) => x !== name) : [...p, name]));
+
+  const filteredEditMembers = useMemo(
+    () => members.filter((m) => m.name.toLowerCase().includes(attSearch.toLowerCase())),
+    [members, attSearch]
+  );
 
   if (loading || !user) {
     return (
@@ -364,7 +408,16 @@ const ArhivIntervencij = () => {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="ed-vodja">Vodja</Label>
-                <Input id="ed-vodja" value={editForm.vodja} onChange={(e) => setEditForm((p) => ({ ...p, vodja: e.target.value }))} />
+                <Select value={editForm.vodja} onValueChange={(v) => setEditForm((p) => ({ ...p, vodja: v }))}>
+                  <SelectTrigger id="ed-vodja">
+                    <SelectValue placeholder="Izberi vodjo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members.map((m) => (
+                      <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="ed-obcina">Občina</Label>
@@ -373,6 +426,28 @@ const ArhivIntervencij = () => {
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="ed-opombe">Opombe</Label>
                 <Textarea id="ed-opombe" rows={3} value={editForm.opombe} onChange={(e) => setEditForm((p) => ({ ...p, opombe: e.target.value }))} />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>Prisotni ({editAttendees.length})</Label>
+                <Input
+                  placeholder="Išči osebo..."
+                  value={attSearch}
+                  onChange={(e) => setAttSearch(e.target.value)}
+                />
+                <div className="max-h-56 overflow-auto grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border border-border rounded-lg p-3 bg-muted/30 text-sm">
+                  {filteredEditMembers.length === 0 && (
+                    <p className="text-muted-foreground text-center py-2 sm:col-span-2">Ni zadetkov</p>
+                  )}
+                  {filteredEditMembers.map((m) => (
+                    <label key={m.id} className="flex items-center gap-2 cursor-pointer">
+                      <Checkbox
+                        checked={editAttendees.includes(m.name)}
+                        onCheckedChange={() => toggleEditAttendee(m.name)}
+                      />
+                      <span>{m.name}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
             <DialogFooter className="gap-2">
