@@ -12,6 +12,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -21,6 +28,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { VEHICLES } from "@/lib/people";
 import { Siren, Plus, Lock, CheckCircle2, Trash2, Radio, User as UserIcon, Clock } from "lucide-react";
+import { formatDateSI, formatDateTimeSI, formatTime24 } from "@/lib/format";
 
 type MajorEvent = {
   id: string;
