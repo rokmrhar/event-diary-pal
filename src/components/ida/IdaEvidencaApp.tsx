@@ -313,19 +313,20 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey, extra
                     {f.label}
                   </TableHead>
                 ))}
+                {extraColumn && <TableHead className="text-center">{extraColumn.label}</TableHead>}
                 {allowed && <TableHead className="text-right w-[120px]">Akcije</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={fields.length + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={fields.length + (extraColumn ? 1 : 0) + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">
                     Nalagam...
                   </TableCell>
                 </TableRow>
               ) : visible.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={fields.length + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={fields.length + (extraColumn ? 1 : 0) + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">
                     Ni zapisov
                   </TableCell>
                 </TableRow>
@@ -338,6 +339,9 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey, extra
                         {f.suffix && r[f.key] !== null && r[f.key] !== undefined && r[f.key] !== "" ? ` ${f.suffix}` : ""}
                       </TableCell>
                     ))}
+                    {extraColumn && (
+                      <TableCell className="text-center font-medium">{extraColumn.render(r)}</TableCell>
+                    )}
                     {allowed && (
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
