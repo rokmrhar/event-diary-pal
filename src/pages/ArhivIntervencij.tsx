@@ -408,7 +408,16 @@ const ArhivIntervencij = () => {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="ed-vodja">Vodja</Label>
-                <Input id="ed-vodja" value={editForm.vodja} onChange={(e) => setEditForm((p) => ({ ...p, vodja: e.target.value }))} />
+                <Select value={editForm.vodja} onValueChange={(v) => setEditForm((p) => ({ ...p, vodja: v }))}>
+                  <SelectTrigger id="ed-vodja">
+                    <SelectValue placeholder="Izberi vodjo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members.map((m) => (
+                      <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="ed-obcina">Občina</Label>
@@ -417,6 +426,28 @@ const ArhivIntervencij = () => {
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="ed-opombe">Opombe</Label>
                 <Textarea id="ed-opombe" rows={3} value={editForm.opombe} onChange={(e) => setEditForm((p) => ({ ...p, opombe: e.target.value }))} />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>Prisotni ({editAttendees.length})</Label>
+                <Input
+                  placeholder="Išči osebo..."
+                  value={attSearch}
+                  onChange={(e) => setAttSearch(e.target.value)}
+                />
+                <div className="max-h-56 overflow-auto grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border border-border rounded-lg p-3 bg-muted/30 text-sm">
+                  {filteredEditMembers.length === 0 && (
+                    <p className="text-muted-foreground text-center py-2 sm:col-span-2">Ni zadetkov</p>
+                  )}
+                  {filteredEditMembers.map((m) => (
+                    <label key={m.id} className="flex items-center gap-2 cursor-pointer">
+                      <Checkbox
+                        checked={editAttendees.includes(m.name)}
+                        onCheckedChange={() => toggleEditAttendee(m.name)}
+                      />
+                      <span>{m.name}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
             <DialogFooter className="gap-2">
