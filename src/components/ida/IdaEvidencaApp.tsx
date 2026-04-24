@@ -46,6 +46,8 @@ export interface IdaField {
   suffix?: string; // e.g. "L", "bar"
 }
 
+type Row = Record<string, unknown> & { id: string; user_id: string };
+
 interface IdaEvidencaAppProps {
   title: string;
   table: "ida_maske" | "ida_hrbtisca" | "ida_tlacne_posode" | "ida_pljucni_avtomati";
@@ -61,8 +63,6 @@ interface IdaEvidencaAppProps {
     render: (row: Row) => React.ReactNode;
   };
 }
-
-type Row = Record<string, unknown> & { id: string; user_id: string };
 
 const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: 80 }, (_, i) => currentYear - i);
