@@ -403,7 +403,16 @@ export default function VecjiObseg() {
             </div>
             <div className="space-y-1.5">
               <Label>Vodja intervencije</Label>
-              <Input value={nVodja} onChange={(e) => setNVodja(e.target.value)} />
+              <Select value={nVodja} onValueChange={setNVodja}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Izberi vodjo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Delovni kanali</Label>
