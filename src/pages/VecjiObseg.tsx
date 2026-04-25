@@ -27,8 +27,9 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { VEHICLES } from "@/lib/people";
-import { Siren, Plus, Lock, CheckCircle2, Trash2, Radio, User as UserIcon, Clock } from "lucide-react";
+import { Siren, Plus, Lock, CheckCircle2, Trash2, Radio, User as UserIcon, Clock, Pencil } from "lucide-react";
 import { formatDateSI, formatDateTimeSI, formatTime24 } from "@/lib/format";
+import { DatePickerSI } from "@/components/ui/date-picker-si";
 
 type MajorEvent = {
   id: string;
@@ -72,6 +73,9 @@ export default function VecjiObseg() {
   const [nVodja, setNVodja] = useState("");
   const [nKanali, setNKanali] = useState("");
   const [nOpombe, setNOpombe] = useState("");
+
+  // Edit major event dialog
+  const [editingEvent, setEditingEvent] = useState<MajorEvent | null>(null);
 
   // Add event inside major event
   const [addingFor, setAddingFor] = useState<MajorEvent | null>(null);
@@ -161,6 +165,65 @@ export default function VecjiObseg() {
     toast({ title: "Večji obseg odprt" });
     setOpenNew(false);
     setNNaziv(""); setNVodja(""); setNKanali(""); setNOpombe("");
+    refresh();
+  };
+
+  const openEditEvent = (ev: MajorEvent) => {
+    setEditingEvent(ev);
+    setNNaziv(ev.naziv);
+    setNVodja(ev.vodja ?? "");
+    setNKanali(ev.delovni_kanali ?? "");
+    setNOpombe(ev.opombe ?? "");
+  };
+
+  const handleSaveEditEvent = async () => {
+    if (!editingEvent) return;
+    if (!nNaziv.trim()) {
+      toast({ title: "Manjka naziv", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase
+      .from("major_events")
+      .update({
+        naziv: nNaziv.trim(),
+        vodja: nVodja.trim() || null,
+        delovni_kanali: nKanali.trim() || null,
+        opombe: nOpombe.trim() || null,
+      })
+      .eq("id", editingEvent.id);
+    if (error) {
+      toast({ title: "Napaka", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Posodobljeno" });
+    setEditingEvent(null);
+    setNNaziv(""); setNVodja(""); setNKanali(""); setNOpombe("");
+    refresh();
+  };
+
+  const handleDeleteEvent = async (ev: MajorEvent) => {
+    const list = dogodkiByEvent[ev.id] ?? [];
+    const msg = list.length > 0
+      ? `Izbrišem "${ev.naziv}" in ${list.length} povezanih dogodkov?`
+      : `Izbrišem "${ev.naziv}"?`;
+    if (!confirm(msg)) return;
+    // Delete child dogodki first (no FK cascade configured by code)
+    if (list.length > 0) {
+      const { error: dErr } = await supabase
+        .from("major_event_dogodki")
+        .delete()
+        .eq("major_event_id", ev.id);
+      if (dErr) {
+        toast({ title: "Napaka pri dogodkih", description: dErr.message, variant: "destructive" });
+        return;
+      }
+    }
+    const { error } = await supabase.from("major_events").delete().eq("id", ev.id);
+    if (error) {
+      toast({ title: "Napaka", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Izbrisano" });
     refresh();
   };
 
