@@ -10,7 +10,7 @@ export default function IdaSeznamVozil() {
   return (
     <IdaEvidencaApp
       title="Seznam IDA po vozilih"
-      table={"ida_vozila" as never}
+      table="ida_vozila"
       fields={FIELDS}
       primaryKey="vozilo"
     />
