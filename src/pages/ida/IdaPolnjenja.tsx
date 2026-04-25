@@ -34,6 +34,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, Lock, Pencil, Plus, Trash2, Gauge } from "lucide-react";
 import { formatDateSI } from "@/lib/format";
+import { DatePickerSI } from "@/components/ui/date-picker-si";
 
 type Posoda = { id: string; interna_st: string };
 type Polnjenje = {
@@ -44,6 +45,7 @@ type Polnjenje = {
   polnil: string;
   opombe: string | null;
   created_at: string;
+  stanje_stevca_h: number | null;
 };
 
 export default function IdaPolnjenja() {
@@ -65,6 +67,7 @@ export default function IdaPolnjenja() {
   const [fPosoda, setFPosoda] = useState("");
   const [fPolnil, setFPolnil] = useState("");
   const [fOpombe, setFOpombe] = useState("");
+  const [fStevec, setFStevec] = useState("");
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
@@ -128,6 +131,7 @@ export default function IdaPolnjenja() {
     setFPosoda("");
     setFPolnil("");
     setFOpombe("");
+    setFStevec("");
     setOpen(true);
   };
 
@@ -137,6 +141,7 @@ export default function IdaPolnjenja() {
     setFPosoda(r.posoda_id);
     setFPolnil(r.polnil);
     setFOpombe(r.opombe ?? "");
+    setFStevec(r.stanje_stevca_h !== null && r.stanje_stevca_h !== undefined ? String(r.stanje_stevca_h) : "");
     setOpen(true);
   };
 
@@ -145,6 +150,11 @@ export default function IdaPolnjenja() {
     if (!user) return;
     if (!fPosoda || !fPolnil.trim() || !fDatum) {
       toast({ title: "Manjkajoči podatki", description: "Izberi posodo, polnitelja in datum.", variant: "destructive" });
+      return;
+    }
+    const stevecNum = fStevec.trim() === "" ? null : Number(fStevec.replace(",", "."));
+    if (stevecNum !== null && isNaN(stevecNum)) {
+      toast({ title: "Napačno stanje števca", description: "Vnesi številko (npr. 1234.5).", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -156,6 +166,7 @@ export default function IdaPolnjenja() {
           datum: fDatum,
           polnil: fPolnil.trim(),
           opombe: fOpombe.trim() || null,
+          stanje_stevca_h: stevecNum,
         })
         .eq("id", editing.id);
       setSaving(false);
@@ -171,6 +182,7 @@ export default function IdaPolnjenja() {
         datum: fDatum,
         polnil: fPolnil.trim(),
         opombe: fOpombe.trim() || null,
+        stanje_stevca_h: stevecNum,
       });
       setSaving(false);
       if (error) {
@@ -255,7 +267,8 @@ export default function IdaPolnjenja() {
               <TableRow>
                 <TableHead>Datum</TableHead>
                 <TableHead>Št. posode</TableHead>
-                <TableHead className="text-center">Stanje št.</TableHead>
+                <TableHead className="text-center">Zap. št.</TableHead>
+                <TableHead className="text-center">Števec (h)</TableHead>
                 <TableHead>Polnil</TableHead>
                 <TableHead>Opombe</TableHead>
                 {allowed && <TableHead className="text-right w-[120px]">Akcije</TableHead>}
@@ -263,15 +276,16 @@ export default function IdaPolnjenja() {
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nalagam...</TableCell></TableRow>
+                <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Nalagam...</TableCell></TableRow>
               ) : visible.length === 0 ? (
-                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Ni zapisov</TableCell></TableRow>
+                <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Ni zapisov</TableCell></TableRow>
               ) : (
                 visible.map((r) => (
                   <TableRow key={r.id}>
                     <TableCell>{formatDateSI(r.datum)}</TableCell>
                     <TableCell className="font-medium">{posodaById[r.posoda_id] ?? "—"}</TableCell>
                     <TableCell className="text-center">{seqByRow[r.id]}</TableCell>
+                    <TableCell className="text-center tabular-nums">{r.stanje_stevca_h ?? "—"}</TableCell>
                     <TableCell>{r.polnil}</TableCell>
                     <TableCell className="text-muted-foreground">{r.opombe ?? "—"}</TableCell>
                     {allowed && (
@@ -301,7 +315,7 @@ export default function IdaPolnjenja() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <Label>Datum *</Label>
-                <Input type="date" value={fDatum} onChange={(e) => setFDatum(e.target.value)} required />
+                <DatePickerSI value={fDatum} onChange={setFDatum} required />
               </div>
               <div className="space-y-1.5">
                 <Label>Št. posode *</Label>
@@ -313,6 +327,17 @@ export default function IdaPolnjenja() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Stanje števca na kompresorju (h)</Label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  inputMode="decimal"
+                  placeholder="npr. 1234.5"
+                  value={fStevec}
+                  onChange={(e) => setFStevec(e.target.value)}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>Polnil *</Label>
