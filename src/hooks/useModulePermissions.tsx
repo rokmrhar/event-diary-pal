@@ -11,6 +11,7 @@ export const MODULES = [
   { key: "services", label: "Servisi" },
   { key: "inspections", label: "Tehnični pregledi" },
   { key: "cylinder_fillings", label: "Polnjenja posod" },
+  { key: "pranja", label: "Pranja" },
 ] as const;
 
 export type ModuleKey = (typeof MODULES)[number]["key"];
