@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DatePickerSI } from "@/components/ui/date-picker-si";
 import { toast } from "@/hooks/use-toast";
 import { VEHICLES, SKUPINE } from "@/lib/people";
 import { useMembers } from "@/hooks/useMembers";
@@ -172,7 +173,7 @@ export default function EvidencaIntervencijApp() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="datum">DATUM *</Label>
-              <Input id="datum" type="date" value={datum} onChange={(e) => setDatum(e.target.value)} required />
+              <DatePickerSI id="datum" value={datum} onChange={setDatum} required />
             </div>
           </div>
 
