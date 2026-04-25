@@ -16,6 +16,7 @@ import IdaHrbtisca from "./pages/ida/IdaHrbtisca.tsx";
 import IdaTlacnePosode from "./pages/ida/IdaTlacnePosode.tsx";
 import IdaPljucniAvtomati from "./pages/ida/IdaPljucniAvtomati.tsx";
 import IdaPolnjenja from "./pages/ida/IdaPolnjenja.tsx";
+import IdaSeznamVozil from "./pages/ida/IdaSeznamVozil.tsx";
 import VecjiObseg from "./pages/VecjiObseg.tsx";
 import Statistika from "./pages/Statistika.tsx";
 import Vozila from "./pages/Vozila.tsx";
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/ida/tlacne-posode" element={<IdaTlacnePosode />} />
             <Route path="/ida/pljucni-avtomati" element={<IdaPljucniAvtomati />} />
             <Route path="/ida/polnjenja" element={<IdaPolnjenja />} />
+            <Route path="/ida/seznam-vozil" element={<IdaSeznamVozil />} />
             <Route path="/vecji-obseg" element={<VecjiObseg />} />
             <Route path="/statistika" element={<Statistika />} />
             <Route path="/vozila" element={<Vozila />} />
