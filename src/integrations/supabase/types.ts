@@ -280,6 +280,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ida_vozila: {
+        Row: {
+          created_at: string
+          id: string
+          ida_aparat: string | null
+          opombe: string | null
+          updated_at: string
+          user_id: string
+          vozilo: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ida_aparat?: string | null
+          opombe?: string | null
+          updated_at?: string
+          user_id: string
+          vozilo?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ida_aparat?: string | null
+          opombe?: string | null
+          updated_at?: string
+          user_id?: string
+          vozilo?: string | null
+        }
+        Relationships: []
+      }
       intervention_attendees: {
         Row: {
           created_at: string
