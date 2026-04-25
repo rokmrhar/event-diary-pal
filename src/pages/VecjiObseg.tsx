@@ -451,7 +451,19 @@ export default function VecjiObseg() {
                       {ev.closed_at && ` • Zaključen: ${formatDateTimeSI(ev.closed_at)}`}
                     </p>
                   </div>
-                  <Badge variant="outline">{(dogodkiByEvent[ev.id] ?? []).length} dogodkov</Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">{(dogodkiByEvent[ev.id] ?? []).length} dogodkov</Badge>
+                    {allowed && (
+                      <>
+                        <Button size="icon" variant="ghost" onClick={() => openEditEvent(ev)} title="Uredi">
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => handleDeleteEvent(ev)} title="Izbriši">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -460,7 +472,7 @@ export default function VecjiObseg() {
       </div>
 
       {/* New major event dialog */}
-      <Dialog open={openNew} onOpenChange={setOpenNew}>
+      <Dialog open={openNew} onOpenChange={(o) => { setOpenNew(o); if (!o) { setNNaziv(""); setNVodja(""); setNKanali(""); setNOpombe(""); } }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Odpri večji obseg</DialogTitle>
@@ -499,6 +511,46 @@ export default function VecjiObseg() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit major event dialog */}
+      <Dialog open={!!editingEvent} onOpenChange={(o) => { if (!o) { setEditingEvent(null); setNNaziv(""); setNVodja(""); setNKanali(""); setNOpombe(""); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Uredi večji obseg</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Naziv *</Label>
+              <Input value={nNaziv} onChange={(e) => setNNaziv(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Vodja intervencije</Label>
+              <Select value={nVodja} onValueChange={setNVodja}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Izberi vodjo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Delovni kanali</Label>
+              <Input value={nKanali} onChange={(e) => setNKanali(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Opombe</Label>
+              <Textarea value={nOpombe} onChange={(e) => setNOpombe(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingEvent(null)}>Prekliči</Button>
+            <Button onClick={handleSaveEditEvent} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">Shrani</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Add dogodek dialog */}
       <Dialog open={!!addingFor} onOpenChange={(o) => !o && setAddingFor(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -513,7 +565,7 @@ export default function VecjiObseg() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Datum *</Label>
-                <Input type="date" value={dDatum} onChange={(e) => setDDatum(e.target.value)} />
+                <DatePickerSI value={dDatum} onChange={setDDatum} required />
               </div>
               <div className="space-y-1.5">
                 <Label>Ura</Label>
