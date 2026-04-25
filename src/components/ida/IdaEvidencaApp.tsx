@@ -50,7 +50,7 @@ type Row = Record<string, unknown> & { id: string; user_id: string };
 
 interface IdaEvidencaAppProps {
   title: string;
-  table: "ida_maske" | "ida_hrbtisca" | "ida_tlacne_posode" | "ida_pljucni_avtomati";
+  table: "ida_maske" | "ida_hrbtisca" | "ida_tlacne_posode" | "ida_pljucni_avtomati" | "ida_vozila";
   fields: IdaField[];
   primaryKey: string; // field shown as primary identifier in table
   /**
