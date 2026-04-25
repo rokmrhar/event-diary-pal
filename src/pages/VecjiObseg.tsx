@@ -383,6 +383,12 @@ export default function VecjiObseg() {
                         <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleClose(ev)}>
                           <CheckCircle2 className="h-4 w-4 mr-1" /> Zaključi
                         </Button>
+                        <Button size="icon" variant="ghost" onClick={() => openEditEvent(ev)} title="Uredi">
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => handleDeleteEvent(ev)} title="Izbriši">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                     )}
                   </div>
