@@ -45,7 +45,7 @@ const sidebarItems: SidebarItem[] = [
   { icon: Flame, label: "POŽARNE STRAŽE" },
   { icon: ShieldCheck, label: "EVIDENCA IDA", to: "/ida" },
   { icon: BarChart3, label: "STATISTIKA", to: "/statistika" },
-  { icon: Biohazard, label: "EVIDENCA PRALNI STROJ" },
+  { icon: Biohazard, label: "EVIDENCA PRANJ", to: "/pranja" },
 ];
 
 export default function AppShell({ children }: AppShellProps) {
