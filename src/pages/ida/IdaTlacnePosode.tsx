@@ -46,6 +46,12 @@ export default function IdaTlacnePosode() {
         label: "Št. polnjenj",
         render: (row) => counts[row.id as string] ?? 0,
       }}
+      rowClassName={(row) => {
+        const v = String(row.vrsta ?? "").toLowerCase();
+        if (v === "kompozit") return "bg-sky-50 dark:bg-sky-950/30 hover:bg-sky-100 dark:hover:bg-sky-950/50";
+        if (v === "jeklena") return "bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50";
+        return undefined;
+      }}
     />
   );
 }

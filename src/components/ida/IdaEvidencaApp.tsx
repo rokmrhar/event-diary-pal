@@ -62,6 +62,11 @@ interface IdaEvidencaAppProps {
     label: string;
     render: (row: Row) => React.ReactNode;
   };
+  /**
+   * Optional function to provide a custom Tailwind class on the table row
+   * (e.g. background color tinting based on row data).
+   */
+  rowClassName?: (row: Row) => string | undefined;
 }
 
 const currentYear = new Date().getFullYear();
@@ -70,7 +75,7 @@ const MONTHS = [
   "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
 ];
 
-export default function IdaEvidencaApp({ title, table, fields, primaryKey, extraColumn }: IdaEvidencaAppProps) {
+export default function IdaEvidencaApp({ title, table, fields, primaryKey, extraColumn, rowClassName }: IdaEvidencaAppProps) {
   const { user } = useAuth();
   const { canEdit } = useModulePermissions();
   const allowed = canEdit("ida");
@@ -332,7 +337,7 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey, extra
                 </TableRow>
               ) : (
                 visible.map((r) => (
-                  <TableRow key={r.id}>
+                  <TableRow key={r.id} className={rowClassName?.(r)}>
                     {fields.map((f) => (
                       <TableCell key={f.key} className={f.key === primaryKey ? "font-medium" : undefined}>
                         {formatCell(f, r[f.key])}
