@@ -1,0 +1,27 @@
+export const PRANJA_PROGRAMI = [
+  "Odvajanje vode iz vreč",
+  "Posebno izpiranje",
+  "Odtok",
+  "Ožemanje",
+  "Čiščenje stroja",
+  "Majce 60˚C",
+  "Majce 40˚C",
+  "Zaščitna obleka",
+  "Zaščitna obleka + impregnacija",
+  "Maske",
+  "Impregnacija (zaščitna obleka)",
+  "Maske s predpranjem",
+  "Čelade",
+  "Pasovi",
+  "Rokavice",
+  "Perilo, ki se kuha",
+  "Pisano perilo",
+  "Eko kratki pisano perilo",
+  "Neobčutljivo perilo",
+  "Občutljivo perilo",
+  "Volna",
+  "Termična dezinfekcija",
+  "Kemo-termič. dezinf. 20min",
+] as const;
+
+export type PranjeProgram = (typeof PRANJA_PROGRAMI)[number];

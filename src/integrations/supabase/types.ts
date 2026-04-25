@@ -526,6 +526,42 @@ export type Database = {
         }
         Relationships: []
       }
+      pranja: {
+        Row: {
+          created_at: string
+          dal_prat: string
+          datum: string
+          id: string
+          opombe: string | null
+          oprema: string
+          programi: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dal_prat: string
+          datum: string
+          id?: string
+          opombe?: string | null
+          oprema: string
+          programi?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dal_prat?: string
+          datum?: string
+          id?: string
+          opombe?: string | null
+          oprema?: string
+          programi?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -561,6 +597,7 @@ export type Database = {
           opombe: string | null
           polnil: string
           posoda_id: string
+          stanje_stevca_h: number | null
           updated_at: string
           user_id: string
         }
@@ -571,6 +608,7 @@ export type Database = {
           opombe?: string | null
           polnil: string
           posoda_id: string
+          stanje_stevca_h?: number | null
           updated_at?: string
           user_id: string
         }
@@ -581,6 +619,7 @@ export type Database = {
           opombe?: string | null
           polnil?: string
           posoda_id?: string
+          stanje_stevca_h?: number | null
           updated_at?: string
           user_id?: string
         }

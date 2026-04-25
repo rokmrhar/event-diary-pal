@@ -27,8 +27,9 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { VEHICLES } from "@/lib/people";
-import { Siren, Plus, Lock, CheckCircle2, Trash2, Radio, User as UserIcon, Clock } from "lucide-react";
+import { Siren, Plus, Lock, CheckCircle2, Trash2, Radio, User as UserIcon, Clock, Pencil } from "lucide-react";
 import { formatDateSI, formatDateTimeSI, formatTime24 } from "@/lib/format";
+import { DatePickerSI } from "@/components/ui/date-picker-si";
 
 type MajorEvent = {
   id: string;
@@ -72,6 +73,9 @@ export default function VecjiObseg() {
   const [nVodja, setNVodja] = useState("");
   const [nKanali, setNKanali] = useState("");
   const [nOpombe, setNOpombe] = useState("");
+
+  // Edit major event dialog
+  const [editingEvent, setEditingEvent] = useState<MajorEvent | null>(null);
 
   // Add event inside major event
   const [addingFor, setAddingFor] = useState<MajorEvent | null>(null);
@@ -161,6 +165,65 @@ export default function VecjiObseg() {
     toast({ title: "Večji obseg odprt" });
     setOpenNew(false);
     setNNaziv(""); setNVodja(""); setNKanali(""); setNOpombe("");
+    refresh();
+  };
+
+  const openEditEvent = (ev: MajorEvent) => {
+    setEditingEvent(ev);
+    setNNaziv(ev.naziv);
+    setNVodja(ev.vodja ?? "");
+    setNKanali(ev.delovni_kanali ?? "");
+    setNOpombe(ev.opombe ?? "");
+  };
+
+  const handleSaveEditEvent = async () => {
+    if (!editingEvent) return;
+    if (!nNaziv.trim()) {
+      toast({ title: "Manjka naziv", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase
+      .from("major_events")
+      .update({
+        naziv: nNaziv.trim(),
+        vodja: nVodja.trim() || null,
+        delovni_kanali: nKanali.trim() || null,
+        opombe: nOpombe.trim() || null,
+      })
+      .eq("id", editingEvent.id);
+    if (error) {
+      toast({ title: "Napaka", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Posodobljeno" });
+    setEditingEvent(null);
+    setNNaziv(""); setNVodja(""); setNKanali(""); setNOpombe("");
+    refresh();
+  };
+
+  const handleDeleteEvent = async (ev: MajorEvent) => {
+    const list = dogodkiByEvent[ev.id] ?? [];
+    const msg = list.length > 0
+      ? `Izbrišem "${ev.naziv}" in ${list.length} povezanih dogodkov?`
+      : `Izbrišem "${ev.naziv}"?`;
+    if (!confirm(msg)) return;
+    // Delete child dogodki first (no FK cascade configured by code)
+    if (list.length > 0) {
+      const { error: dErr } = await supabase
+        .from("major_event_dogodki")
+        .delete()
+        .eq("major_event_id", ev.id);
+      if (dErr) {
+        toast({ title: "Napaka pri dogodkih", description: dErr.message, variant: "destructive" });
+        return;
+      }
+    }
+    const { error } = await supabase.from("major_events").delete().eq("id", ev.id);
+    if (error) {
+      toast({ title: "Napaka", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Izbrisano" });
     refresh();
   };
 
@@ -320,6 +383,12 @@ export default function VecjiObseg() {
                         <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleClose(ev)}>
                           <CheckCircle2 className="h-4 w-4 mr-1" /> Zaključi
                         </Button>
+                        <Button size="icon" variant="ghost" onClick={() => openEditEvent(ev)} title="Uredi">
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => handleDeleteEvent(ev)} title="Izbriši">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                     )}
                   </div>
@@ -382,7 +451,19 @@ export default function VecjiObseg() {
                       {ev.closed_at && ` • Zaključen: ${formatDateTimeSI(ev.closed_at)}`}
                     </p>
                   </div>
-                  <Badge variant="outline">{(dogodkiByEvent[ev.id] ?? []).length} dogodkov</Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">{(dogodkiByEvent[ev.id] ?? []).length} dogodkov</Badge>
+                    {allowed && (
+                      <>
+                        <Button size="icon" variant="ghost" onClick={() => openEditEvent(ev)} title="Uredi">
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => handleDeleteEvent(ev)} title="Izbriši">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -391,7 +472,7 @@ export default function VecjiObseg() {
       </div>
 
       {/* New major event dialog */}
-      <Dialog open={openNew} onOpenChange={setOpenNew}>
+      <Dialog open={openNew} onOpenChange={(o) => { setOpenNew(o); if (!o) { setNNaziv(""); setNVodja(""); setNKanali(""); setNOpombe(""); } }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Odpri večji obseg</DialogTitle>
@@ -430,6 +511,46 @@ export default function VecjiObseg() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit major event dialog */}
+      <Dialog open={!!editingEvent} onOpenChange={(o) => { if (!o) { setEditingEvent(null); setNNaziv(""); setNVodja(""); setNKanali(""); setNOpombe(""); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Uredi večji obseg</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Naziv *</Label>
+              <Input value={nNaziv} onChange={(e) => setNNaziv(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Vodja intervencije</Label>
+              <Select value={nVodja} onValueChange={setNVodja}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Izberi vodjo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Delovni kanali</Label>
+              <Input value={nKanali} onChange={(e) => setNKanali(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Opombe</Label>
+              <Textarea value={nOpombe} onChange={(e) => setNOpombe(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingEvent(null)}>Prekliči</Button>
+            <Button onClick={handleSaveEditEvent} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">Shrani</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Add dogodek dialog */}
       <Dialog open={!!addingFor} onOpenChange={(o) => !o && setAddingFor(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -444,7 +565,7 @@ export default function VecjiObseg() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Datum *</Label>
-                <Input type="date" value={dDatum} onChange={(e) => setDDatum(e.target.value)} />
+                <DatePickerSI value={dDatum} onChange={setDDatum} required />
               </div>
               <div className="space-y-1.5">
                 <Label>Ura</Label>

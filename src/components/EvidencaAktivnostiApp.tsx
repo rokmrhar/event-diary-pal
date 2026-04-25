@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { DatePickerSI } from "@/components/ui/date-picker-si";
 import { toast } from "@/hooks/use-toast";
 import { ACTIVITY_TYPES } from "@/lib/people";
 import { useMembers } from "@/hooks/useMembers";
@@ -132,7 +133,7 @@ export default function EvidencaAktivnostiApp() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="datum">DATUM *</Label>
-              <Input id="datum" type="date" value={datum} onChange={(e) => setDatum(e.target.value)} required />
+              <DatePickerSI id="datum" value={datum} onChange={setDatum} required />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="kraj">KRAJ *</Label>

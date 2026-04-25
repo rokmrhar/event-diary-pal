@@ -22,6 +22,9 @@ import Vozila from "./pages/Vozila.tsx";
 import Servisi from "./pages/Servisi.tsx";
 import KnjigaServisov from "./pages/servisi/KnjigaServisov.tsx";
 import TehnicniPregledi from "./pages/servisi/TehnicniPregledi.tsx";
+import Pranja from "./pages/Pranja.tsx";
+import VnosPranja from "./pages/pranja/VnosPranja.tsx";
+import ArhivPranj from "./pages/pranja/ArhivPranj.tsx";
 import { AuthProvider } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -52,6 +55,9 @@ const App = () => (
             <Route path="/servisi" element={<Servisi />} />
             <Route path="/servisi/knjiga" element={<KnjigaServisov />} />
             <Route path="/servisi/tehnicni-pregledi" element={<TehnicniPregledi />} />
+            <Route path="/pranja" element={<Pranja />} />
+            <Route path="/pranja/vnos" element={<VnosPranja />} />
+            <Route path="/pranja/arhiv" element={<ArhivPranj />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
