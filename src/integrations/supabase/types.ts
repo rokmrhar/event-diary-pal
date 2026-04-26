@@ -85,6 +85,48 @@ export type Database = {
           },
         ]
       }
+      app_settings: {
+        Row: {
+          id: string
+          reminder_days_before: number | null
+          reminder_recipients: string[] | null
+          smtp_from: string | null
+          smtp_from_name: string | null
+          smtp_host: string | null
+          smtp_pass: string | null
+          smtp_port: number | null
+          smtp_secure: boolean | null
+          smtp_user: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          reminder_days_before?: number | null
+          reminder_recipients?: string[] | null
+          smtp_from?: string | null
+          smtp_from_name?: string | null
+          smtp_host?: string | null
+          smtp_pass?: string | null
+          smtp_port?: number | null
+          smtp_secure?: boolean | null
+          smtp_user?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          reminder_days_before?: number | null
+          reminder_recipients?: string[] | null
+          smtp_from?: string | null
+          smtp_from_name?: string | null
+          smtp_host?: string | null
+          smtp_pass?: string | null
+          smtp_port?: number | null
+          smtp_secure?: boolean | null
+          smtp_user?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ida_hrbtisca: {
         Row: {
           created_at: string
@@ -555,6 +597,71 @@ export type Database = {
           vodja?: string | null
         }
         Relationships: []
+      }
+      medical_checks: {
+        Row: {
+          created_at: string
+          id: string
+          member_name: string
+          naslednji_pregled: string | null
+          opombe: string | null
+          updated_at: string
+          user_id: string
+          zadnji_pregled: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_name: string
+          naslednji_pregled?: string | null
+          opombe?: string | null
+          updated_at?: string
+          user_id: string
+          zadnji_pregled?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_name?: string
+          naslednji_pregled?: string | null
+          opombe?: string | null
+          updated_at?: string
+          user_id?: string
+          zadnji_pregled?: string | null
+        }
+        Relationships: []
+      }
+      medical_reminder_log: {
+        Row: {
+          id: string
+          medical_check_id: string
+          naslednji_pregled: string
+          recipients: string[]
+          sent_at: string
+        }
+        Insert: {
+          id?: string
+          medical_check_id: string
+          naslednji_pregled: string
+          recipients?: string[]
+          sent_at?: string
+        }
+        Update: {
+          id?: string
+          medical_check_id?: string
+          naslednji_pregled?: string
+          recipients?: string[]
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_reminder_log_medical_check_id_fkey"
+            columns: ["medical_check_id"]
+            isOneToOne: false
+            referencedRelation: "medical_checks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       members: {
         Row: {

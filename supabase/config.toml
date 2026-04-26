@@ -1,1 +1,4 @@
 project_id = "ksptcnbwclbedxvanzer"
+
+[functions.send-medical-reminders]
+verify_jwt = false

@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Pencil } from "lucide-react";
+import { Pencil, UserPlus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { MODULES, type ModuleKey } from "@/hooks/useModulePermissions";
 
@@ -37,6 +37,12 @@ export default function UsersTab() {
   const [editName, setEditName] = useState("");
   const [editPassword, setEditPassword] = useState("");
   const [saving, setSaving] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newPass, setNewPass] = useState("");
+  const [newAdmin, setNewAdmin] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -176,12 +182,17 @@ export default function UsersTab() {
 
   return (
     <div className="space-y-4">
-      <Input
-        placeholder="Išči uporabnika..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm w-full"
-      />
+      <div className="flex items-center gap-2 flex-wrap">
+        <Input
+          placeholder="Išči uporabnika..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-sm w-full"
+        />
+        <Button onClick={() => { setNewEmail(""); setNewName(""); setNewPass(""); setNewAdmin(false); setCreateOpen(true); }}>
+          <UserPlus className="h-4 w-4 mr-1" /> Dodaj uporabnika
+        </Button>
+      </div>
 
       <div className="hidden sm:block overflow-x-auto border border-border rounded-xl">
         <Table>
@@ -338,49 +349,121 @@ export default function UsersTab() {
       </div>
 
       <Dialog open={!!editing} onOpenChange={(o) => !o && closeEdit()}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Uredi uporabnika</DialogTitle>
             <DialogDescription>
-              Spremeni e-pošto, ime ali geslo. Geslo pusti prazno, če ga ne želiš spremeniti.
+              Spremeni podatke, vlogo in pravice modulov. Geslo pusti prazno, če ga ne želiš spremeniti.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-email">E-pošta</Label>
-              <Input
-                id="edit-email"
-                type="email"
-                value={editEmail}
-                onChange={(e) => setEditEmail(e.target.value)}
-              />
+          {editing && (
+            <div className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-email">E-pošta</Label>
+                  <Input id="edit-email" type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-name">Ime / prikazno ime</Label>
+                  <Input id="edit-name" value={editName} onChange={(e) => setEditName(e.target.value)} />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="edit-pass">Novo geslo</Label>
+                  <Input id="edit-pass" type="password" placeholder="Pusti prazno za nespremenjeno" value={editPassword} onChange={(e) => setEditPassword(e.target.value)} />
+                  <p className="text-xs text-muted-foreground">Najmanj 6 znakov.</p>
+                </div>
+              </div>
+
+              <div className="border-t border-border pt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-semibold">Admin pravice</Label>
+                  <Switch
+                    checked={isAdminUser(editing.user_id)}
+                    disabled={pendingId === editing.user_id}
+                    onCheckedChange={(c) => toggleAdmin(editing.user_id, c)}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Admin ima samodejno vse pravice modulov.</p>
+              </div>
+
+              <div className="border-t border-border pt-4 space-y-3">
+                <Label className="text-base font-semibold">Pravice urejanja po modulih</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {MODULES.map((m) => {
+                    const admin = isAdminUser(editing.user_id);
+                    const enabled = admin || hasPerm(editing.user_id, m.key);
+                    return (
+                      <div key={m.key} className="flex items-center justify-between border border-border rounded-lg px-3 py-2">
+                        <Label className="text-sm">{m.label}</Label>
+                        <Switch
+                          checked={enabled}
+                          disabled={admin || permPending === `${editing.user_id}-${m.key}`}
+                          onCheckedChange={(c) => togglePerm(editing.user_id, m.key, c)}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-name">Ime / prikazno ime</Label>
-              <Input
-                id="edit-name"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="edit-pass">Novo geslo</Label>
-              <Input
-                id="edit-pass"
-                type="password"
-                placeholder="Pusti prazno za nespremenjeno"
-                value={editPassword}
-                onChange={(e) => setEditPassword(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">Najmanj 6 znakov.</p>
-            </div>
-          </div>
+          )}
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={closeEdit} disabled={saving}>
-              Prekliči
+              Zapri
             </Button>
             <Button onClick={saveEdit} disabled={saving}>
               {saving ? "Shranjujem..." : "Shrani"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Dodaj novega uporabnika</DialogTitle>
+            <DialogDescription>Račun se ustvari brez potrditvene e-pošte.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="new-email">E-pošta</Label>
+              <Input id="new-email" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="new-name">Ime</Label>
+              <Input id="new-name" value={newName} onChange={(e) => setNewName(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="new-pass">Geslo</Label>
+              <Input id="new-pass" type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} />
+              <p className="text-xs text-muted-foreground">Najmanj 6 znakov.</p>
+            </div>
+            <div className="flex items-center justify-between border border-border rounded-lg px-3 py-2">
+              <Label htmlFor="new-admin">Admin pravice</Label>
+              <Switch id="new-admin" checked={newAdmin} onCheckedChange={setNewAdmin} />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setCreateOpen(false)} disabled={creating}>Prekliči</Button>
+            <Button
+              disabled={creating}
+              onClick={async () => {
+                setCreating(true);
+                const { data, error } = await supabase.functions.invoke("admin-create-user", {
+                  body: { email: newEmail, password: newPass, display_name: newName, make_admin: newAdmin },
+                });
+                setCreating(false);
+                const errMsg = (data as { error?: string })?.error ?? error?.message;
+                if (errMsg) {
+                  toast({ title: "Napaka", description: errMsg, variant: "destructive" });
+                  return;
+                }
+                toast({ title: "Uporabnik ustvarjen" });
+                setCreateOpen(false);
+                load();
+              }}
+            >
+              {creating ? "Ustvarjam..." : "Ustvari"}
             </Button>
           </DialogFooter>
         </DialogContent>

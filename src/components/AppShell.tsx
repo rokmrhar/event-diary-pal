@@ -41,7 +41,7 @@ const sidebarItems: SidebarItem[] = [
   { icon: Truck, label: "POTNI NALOG" },
   { icon: Wrench, label: "PREGLED SERVISOV", to: "/servisi" },
   { icon: Truck, label: "VOZILA", to: "/vozila" },
-  { icon: Stethoscope, label: "ZDRAVNIŠKI PREGLEDI" },
+  { icon: Stethoscope, label: "ZDRAVNIŠKI PREGLEDI", to: "/zdravniski-pregledi" },
   { icon: Flame, label: "POŽARNE STRAŽE" },
   { icon: ShieldCheck, label: "EVIDENCA IDA", to: "/ida" },
   { icon: BarChart3, label: "STATISTIKA", to: "/statistika" },
