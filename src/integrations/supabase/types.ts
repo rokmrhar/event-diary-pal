@@ -283,32 +283,53 @@ export type Database = {
       ida_vozila: {
         Row: {
           created_at: string
+          hrbtisce_id: string | null
           id: string
           ida_aparat: string | null
           opombe: string | null
+          pljucni_avtomat_id: string | null
           updated_at: string
           user_id: string
           vozilo: string | null
         }
         Insert: {
           created_at?: string
+          hrbtisce_id?: string | null
           id?: string
           ida_aparat?: string | null
           opombe?: string | null
+          pljucni_avtomat_id?: string | null
           updated_at?: string
           user_id: string
           vozilo?: string | null
         }
         Update: {
           created_at?: string
+          hrbtisce_id?: string | null
           id?: string
           ida_aparat?: string | null
           opombe?: string | null
+          pljucni_avtomat_id?: string | null
           updated_at?: string
           user_id?: string
           vozilo?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ida_vozila_hrbtisce_id_fkey"
+            columns: ["hrbtisce_id"]
+            isOneToOne: false
+            referencedRelation: "ida_hrbtisca"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ida_vozila_pljucni_avtomat_id_fkey"
+            columns: ["pljucni_avtomat_id"]
+            isOneToOne: false
+            referencedRelation: "ida_pljucni_avtomati"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       intervention_attendees: {
         Row: {
