@@ -9,6 +9,7 @@ import StatsTab from "@/components/admin/StatsTab";
 import MembersTab from "@/components/admin/MembersTab";
 import ActivitiesTab from "@/components/admin/ActivitiesTab";
 import UsersTab from "@/components/admin/UsersTab";
+import SettingsTab from "@/components/admin/SettingsTab";
 
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -50,11 +51,12 @@ export default function Admin() {
 
       <div className="max-w-7xl mx-auto p-3 sm:p-6 lg:p-8 space-y-4">
         <Tabs defaultValue="stats" className="w-full">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full h-auto gap-1">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-5 w-full h-auto gap-1">
             <TabsTrigger value="stats" className="text-xs sm:text-sm">Statistika</TabsTrigger>
             <TabsTrigger value="activities" className="text-xs sm:text-sm">Aktivnosti</TabsTrigger>
             <TabsTrigger value="members" className="text-xs sm:text-sm">Člani</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm">Uporabniki</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs sm:text-sm">Nastavitve</TabsTrigger>
           </TabsList>
 
           <div className="bg-card border border-border rounded-2xl shadow-sm p-3 sm:p-5 lg:p-6 mt-4">
@@ -69,6 +71,9 @@ export default function Admin() {
             </TabsContent>
             <TabsContent value="users" className="mt-0">
               <UsersTab />
+            </TabsContent>
+            <TabsContent value="settings" className="mt-0">
+              <SettingsTab />
             </TabsContent>
           </div>
         </Tabs>
