@@ -31,6 +31,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useModulePermissions } from "@/hooks/useModulePermissions";
+import { useVehicles } from "@/hooks/useVehicles";
 
 type Row = {
   id: string;
@@ -49,6 +50,7 @@ export default function IdaSeznamVozil() {
   const { user } = useAuth();
   const { canEdit } = useModulePermissions();
   const allowed = canEdit("ida");
+  const { vehicles } = useVehicles();
 
   const [rows, setRows] = useState<Row[]>([]);
   const [hrbtisca, setHrbtisca] = useState<Hrb[]>([]);
@@ -250,12 +252,22 @@ export default function IdaSeznamVozil() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5 sm:col-span-2">
                   <Label htmlFor="vozilo">Vozilo</Label>
-                  <Input
-                    id="vozilo"
-                    value={form.vozilo}
-                    onChange={(e) => setForm((p) => ({ ...p, vozilo: e.target.value }))}
-                    placeholder="npr. GVC-1, AC-1..."
-                  />
+                  <Select
+                    value={form.vozilo || NONE}
+                    onValueChange={(v) => setForm((p) => ({ ...p, vozilo: v === NONE ? "" : v }))}
+                  >
+                    <SelectTrigger id="vozilo">
+                      <SelectValue placeholder="Izberi vozilo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NONE}>—</SelectItem>
+                      {vehicles.map((veh) => (
+                        <SelectItem key={veh.id} value={veh.oznaka}>
+                          {veh.oznaka}{veh.znamka ? ` — ${veh.znamka}${veh.model ? ` ${veh.model}` : ""}` : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="hrbtisce">Hrbtišče (serijska št.)</Label>
