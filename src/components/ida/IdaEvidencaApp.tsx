@@ -70,7 +70,7 @@ interface IdaEvidencaAppProps {
 }
 
 const currentYear = new Date().getFullYear();
-const YEARS = Array.from({ length: 80 }, (_, i) => currentYear - i);
+const YEARS = Array.from({ length: 100 }, (_, i) => currentYear - i);
 const MONTHS = [
   "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
 ];
