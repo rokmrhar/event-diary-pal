@@ -8,6 +8,9 @@ export default function Pranja() {
     <AppShell>
       <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
         <div className="flex items-center gap-3">
+          <Button asChild variant="ghost" size="sm">
+              <Link to="/"><ArrowLeft className="h-4 w-4 mr-1" /> Domov</Link>
+            </Button>
           <Biohazard className="h-7 w-7 text-brand-red" />
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase">
             Evidenca pranj
