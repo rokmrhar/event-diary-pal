@@ -184,9 +184,6 @@ export default function AppShell({ children }: AppShellProps) {
                   {isAdmin && " - Admin"}
                 </span>
               </div>
-              <IconBtn label="Obvestila"><Bell className="h-4 w-4" /></IconBtn>
-              <IconBtn label="Sporočila"><MessageSquare className="h-4 w-4" /></IconBtn>
-              <IconBtn label="Tema"><Moon className="h-4 w-4" /></IconBtn>
               {isAdmin && (
                 <Button asChild size="icon" variant="ghost" className="text-brand-navy-foreground hover:bg-white/10 hover:text-brand-navy-foreground" title="Admin">
                   <Link to="/admin"><Settings className="h-4 w-4" /></Link>
