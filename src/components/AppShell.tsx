@@ -141,6 +141,11 @@ export default function AppShell({ children }: AppShellProps) {
           })}
         </nav>
 
+        <div className="px-4 py-2 flex items-center gap-2 text-xs uppercase text-white/50">
+          <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
+          V IZDELAVI
+        </div>
+
         {/* Footer */}
         <div className="px-4 py-3 text-[10px] text-white/40 border-t border-white/10 italic">
           Izdelava: Rok Mrhar, 2026
