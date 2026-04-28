@@ -34,18 +34,18 @@ interface AppShellProps {
 type SidebarItem = { icon: LucideIcon; label: string; to?: string };
 
 const sidebarItems: SidebarItem[] = [
-  { icon: AlertCircle, label: "DOGODEK VEČJEGA OBSEGA", to: "/vecji-obseg" },
   { icon: ClipboardList, label: "POROČILO O INTERVENCIJI", to: "/intervencija" },
-  { icon: Archive, label: "ARHIV INTERVENCIJ", to: "/arhiv-intervencij" },
   { icon: PencilLine, label: "VNOS AKTIVNOSTI", to: "/aktivnost" },
-  { icon: Truck, label: "POTNI NALOG" },
-  { icon: Wrench, label: "PREGLED SERVISOV", to: "/servisi" },
+  { icon: Archive, label: "ARHIV INTERVENCIJ", to: "/arhiv-intervencij" },
+  { icon: AlertCircle, label: "DOGODEK VEČJEGA OBSEGA", to: "/vecji-obseg" },
+  { icon: Wrench, label: "SERVISNA KNJIGA", to: "/servisi" },
   { icon: Truck, label: "VOZILA", to: "/vozila" },
   { icon: Stethoscope, label: "ZDRAVNIŠKI PREGLEDI", to: "/zdravniski-pregledi" },
-  { icon: Flame, label: "POŽARNE STRAŽE" },
   { icon: ShieldCheck, label: "EVIDENCA IDA", to: "/ida" },
-  { icon: BarChart3, label: "STATISTIKA", to: "/statistika" },
   { icon: Biohazard, label: "EVIDENCA PRANJ", to: "/pranja" },
+  { icon: BarChart3, label: "STATISTIKA", to: "/statistika" },
+  { icon: Flame, label: "POŽARNE STRAŽE" },
+  { icon: Truck, label: "POTNI NALOG" },
 ];
 
 export default function AppShell({ children }: AppShellProps) {
