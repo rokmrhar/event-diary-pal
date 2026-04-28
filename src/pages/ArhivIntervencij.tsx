@@ -32,7 +32,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Trash2, Calendar, MapPin, Clock, User, Users, Truck, Pencil } from "lucide-react";
+import { Trash2, Calendar, MapPin, Clock, User, Users, Truck, Pencil, Archive } from "lucide-react";
 
 type InterventionRow = {
   id: string;
