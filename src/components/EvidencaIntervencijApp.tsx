@@ -61,7 +61,7 @@ export default function EvidencaIntervencijApp() {
     setTrajanjeDo("");
     setCasPolneUre("");
     setNaziv("");
-    setSkupina("VSA");
+    setSkupina("VSA OPERATIVA");
     setObcina("sempeter");
     setObcinaDrugo("");
     setVodja("");
@@ -198,7 +198,7 @@ export default function EvidencaIntervencijApp() {
           </div>
 
           <fieldset className="space-y-2">
-            <legend className="text-sm font-medium mb-2">SKUPINA OPERATIVA *</legend>
+            <legend className="text-sm font-medium mb-2">SKUPINA *</legend>
             <RadioGroup value={skupina} onValueChange={setSkupina} className="flex flex-wrap gap-3">
               {SKUPINE.map((s) => (
                 <div key={s} className="flex items-center gap-2">
