@@ -201,23 +201,19 @@ export default function UsersTab() {
               <TableHead>E-pošta</TableHead>
               <TableHead>Ime</TableHead>
               <TableHead className="text-center">Vloga</TableHead>
-              <TableHead className="text-center w-[100px]">Admin</TableHead>
-              {MODULES.map((m) => (
-                <TableHead key={m.key} className="text-center w-[110px]">{m.label}</TableHead>
-              ))}
-              <TableHead className="text-right w-[100px]">Uredi</TableHead>
+              <TableHead className="text-right w-[120px]">Uredi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={5 + MODULES.length} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                   Nalagam...
                 </TableCell>
               </TableRow>
             ) : visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5 + MODULES.length} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                   Ni uporabnikov
                 </TableCell>
               </TableRow>
@@ -237,40 +233,13 @@ export default function UsersTab() {
                         {admin ? "admin" : "user"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <Label htmlFor={`adm-${p.user_id}`} className="sr-only">
-                          Admin pravice
-                        </Label>
-                        <Switch
-                          id={`adm-${p.user_id}`}
-                          checked={admin}
-                          disabled={pendingId === p.user_id}
-                          onCheckedChange={(checked) => toggleAdmin(p.user_id, checked)}
-                        />
-                      </div>
-                    </TableCell>
-                    {MODULES.map((m) => {
-                      const enabled = admin || hasPerm(p.user_id, m.key);
-                      return (
-                        <TableCell key={m.key} className="text-center">
-                          <Switch
-                            checked={enabled}
-                            disabled={admin || permPending === `${p.user_id}-${m.key}`}
-                            onCheckedChange={(c) => togglePerm(p.user_id, m.key, c)}
-                            aria-label={`Urejanje: ${m.label}`}
-                          />
-                        </TableCell>
-                      );
-                    })}
                     <TableCell className="text-right">
                       <Button
-                        size="icon"
-                        variant="ghost"
+                        size="sm"
+                        variant="outline"
                         onClick={() => openEdit(p)}
-                        aria-label="Uredi uporabnika"
                       >
-                        <Pencil className="h-4 w-4" />
+                        <Pencil className="h-4 w-4 mr-1" /> Uredi
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -306,41 +275,9 @@ export default function UsersTab() {
                       {admin ? "admin" : "user"}
                     </Badge>
                   </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    <Label htmlFor={`adm-m-${p.user_id}`} className="text-xs text-muted-foreground">
-                      Admin
-                    </Label>
-                    <Switch
-                      id={`adm-m-${p.user_id}`}
-                      checked={admin}
-                      disabled={pendingId === p.user_id}
-                      onCheckedChange={(checked) => toggleAdmin(p.user_id, checked)}
-                    />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="mt-2"
-                      onClick={() => openEdit(p)}
-                    >
-                      <Pencil className="h-3 w-3 mr-1" /> Uredi
-                    </Button>
-                  </div>
-                </div>
-                <div className="mt-3 pt-3 border-t border-border space-y-2">
-                  <p className="text-xs text-muted-foreground font-medium">Pravice urejanja:</p>
-                  {MODULES.map((m) => {
-                    const enabled = admin || hasPerm(p.user_id, m.key);
-                    return (
-                      <div key={m.key} className="flex items-center justify-between">
-                        <Label className="text-sm">{m.label}</Label>
-                        <Switch
-                          checked={enabled}
-                          disabled={admin || permPending === `${p.user_id}-${m.key}`}
-                          onCheckedChange={(c) => togglePerm(p.user_id, m.key, c)}
-                        />
-                      </div>
-                    );
-                  })}
+                  <Button size="sm" variant="outline" onClick={() => openEdit(p)}>
+                    <Pencil className="h-3 w-3 mr-1" /> Uredi
+                  </Button>
                 </div>
               </div>
             );

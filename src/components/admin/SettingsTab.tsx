@@ -27,6 +27,8 @@ export default function SettingsTab() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [testEmail, setTestEmail] = useState("");
+  const [sendingTest, setSendingTest] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -87,6 +89,25 @@ export default function SettingsTab() {
     });
   };
 
+  const sendTest = async () => {
+    const to = testEmail.trim();
+    if (!to.includes("@")) {
+      return toast({ title: "Neveljaven naslov", description: "Vpiši veljaven e-naslov.", variant: "destructive" });
+    }
+    setSendingTest(true);
+    const { data, error } = await supabase.functions.invoke("send-medical-reminders", {
+      body: { test: true, recipient: to },
+    });
+    setSendingTest(false);
+    if (error) return toast({ title: "Napaka", description: error.message, variant: "destructive" });
+    const r = data as { ok: boolean; message?: string; error?: string };
+    toast({
+      title: r.ok ? "Testno sporočilo poslano" : "Napaka pri pošiljanju",
+      description: r.message ?? r.error ?? "",
+      variant: r.ok ? "default" : "destructive",
+    });
+  };
+
   if (loading || !s) return <p className="text-sm text-muted-foreground">Nalagam...</p>;
 
   return (
@@ -124,6 +145,28 @@ export default function SettingsTab() {
           <div className="flex items-center justify-between border border-border rounded-lg px-3 py-2 sm:col-span-2">
             <Label>SSL/TLS (port 465)</Label>
             <Switch checked={!!s.smtp_secure} onCheckedChange={(c) => update({ smtp_secure: c })} />
+          </div>
+        </div>
+
+        <div className="border border-dashed border-border rounded-lg p-4 mt-2 space-y-3">
+          <div>
+            <Label className="text-sm font-semibold">Pošlji testno sporočilo</Label>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Najprej shrani SMTP nastavitve, nato vpiši e-naslov za preizkus delovanja.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Input
+              type="email"
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              placeholder="prejemnik@example.com"
+              className="flex-1"
+            />
+            <Button type="button" variant="outline" onClick={sendTest} disabled={sendingTest}>
+              <Send className="h-4 w-4 mr-1" />
+              {sendingTest ? "Pošiljam..." : "Pošlji test"}
+            </Button>
           </div>
         </div>
       </section>

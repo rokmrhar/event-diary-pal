@@ -40,6 +40,12 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    // Parse optional body for test mode
+    let body: { test?: boolean; recipient?: string } = {};
+    if (req.method === "POST") {
+      try { body = await req.json(); } catch { body = {}; }
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
@@ -56,6 +62,53 @@ Deno.serve(async (req) => {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // TEST MODE: send a single test email to a chosen address
+    if (body.test) {
+      const to = (body.recipient ?? "").trim();
+      if (!to.includes("@")) {
+        return new Response(JSON.stringify({ ok: false, error: "Neveljaven prejemnik" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const port = settings.smtp_port ?? 587;
+      const client = new SMTPClient({
+        connection: {
+          hostname: settings.smtp_host,
+          port,
+          tls: !!settings.smtp_secure,
+          auth: settings.smtp_user && settings.smtp_pass ? { username: settings.smtp_user, password: settings.smtp_pass } : undefined,
+        },
+      });
+      const fromName = settings.smtp_from_name || "PGD";
+      const from = `${fromName} <${settings.smtp_from}>`;
+      try {
+        await client.send({
+          from,
+          to: [to],
+          subject: "Testno sporočilo — PGD aplikacija",
+          content: "auto",
+          html: `
+            <h2>Testno sporočilo</h2>
+            <p>To je preizkusno sporočilo iz PGD aplikacije.</p>
+            <p>Če ste ga prejeli, so SMTP nastavitve pravilne. ✅</p>
+            <hr>
+            <p style="color:#666;font-size:12px">Strežnik: ${settings.smtp_host}:${port}</p>
+          `,
+        });
+        await client.close();
+        return new Response(JSON.stringify({ ok: true, message: `Testno sporočilo poslano na ${to}` }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        try { await client.close(); } catch { /* ignore */ }
+        return new Response(JSON.stringify({ ok: false, error: msg }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const recipients = (settings.reminder_recipients ?? []).filter((e) => e && e.includes("@"));
     if (recipients.length === 0) {
       return new Response(JSON.stringify({ ok: false, message: "Ni prejemnikov" }), {

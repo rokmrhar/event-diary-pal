@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Lock, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Lock, Pencil, Plus, Trash2 } from "lucide-react";
 import AppShell from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -37,8 +43,8 @@ type Row = {
   id: string;
   user_id: string;
   vozilo: string | null;
-  hrbtisce_id: string | null;
-  pljucni_avtomat_id: string | null;
+  hrbtisce_ids: string[] | null;
+  pljucni_avtomat_ids: string[] | null;
 };
 
 type Hrb = { id: string; serijska_st: string | null; interna_st: string };
@@ -59,13 +65,13 @@ export default function IdaSeznamVozil() {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
-  const [form, setForm] = useState({ vozilo: "", hrbtisce_id: "", pljucni_avtomat_id: "" });
+  const [form, setForm] = useState<{ vozilo: string; hrbtisce_ids: string[]; pljucni_avtomat_ids: string[] }>({ vozilo: "", hrbtisce_ids: [], pljucni_avtomat_ids: [] });
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
     setLoading(true);
     const [v, h, p] = await Promise.all([
-      supabase.from("ida_vozila").select("id, user_id, vozilo, hrbtisce_id, pljucni_avtomat_id").order("created_at", { ascending: false }),
+      supabase.from("ida_vozila").select("id, user_id, vozilo, hrbtisce_ids, pljucni_avtomat_ids").order("created_at", { ascending: false }),
       supabase.from("ida_hrbtisca").select("id, serijska_st, interna_st").order("interna_st"),
       supabase.from("ida_pljucni_avtomati").select("id, serijska_st, naziv").order("naziv"),
     ]);
@@ -87,21 +93,19 @@ export default function IdaSeznamVozil() {
     const q = search.toLowerCase().trim();
     if (!q) return rows;
     return rows.filter((r) => {
-      const hrb = r.hrbtisce_id ? hrbMap.get(r.hrbtisce_id) : null;
-      const pa = r.pljucni_avtomat_id ? paMap.get(r.pljucni_avtomat_id) : null;
+      const hrbs = (r.hrbtisce_ids ?? []).map((id) => hrbMap.get(id)).filter(Boolean) as Hrb[];
+      const pas = (r.pljucni_avtomat_ids ?? []).map((id) => paMap.get(id)).filter(Boolean) as PA[];
       return (
         (r.vozilo ?? "").toLowerCase().includes(q) ||
-        (hrb?.serijska_st ?? "").toLowerCase().includes(q) ||
-        (hrb?.interna_st ?? "").toLowerCase().includes(q) ||
-        (pa?.serijska_st ?? "").toLowerCase().includes(q) ||
-        (pa?.naziv ?? "").toLowerCase().includes(q)
+        hrbs.some((h) => (h.serijska_st ?? "").toLowerCase().includes(q) || h.interna_st.toLowerCase().includes(q)) ||
+        pas.some((a) => (a.serijska_st ?? "").toLowerCase().includes(q) || (a.naziv ?? "").toLowerCase().includes(q))
       );
     });
   }, [rows, search, hrbMap, paMap]);
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ vozilo: "", hrbtisce_id: "", pljucni_avtomat_id: "" });
+    setForm({ vozilo: "", hrbtisce_ids: [], pljucni_avtomat_ids: [] });
     setOpen(true);
   };
 
@@ -109,8 +113,8 @@ export default function IdaSeznamVozil() {
     setEditing(row);
     setForm({
       vozilo: row.vozilo ?? "",
-      hrbtisce_id: row.hrbtisce_id ?? "",
-      pljucni_avtomat_id: row.pljucni_avtomat_id ?? "",
+      hrbtisce_ids: row.hrbtisce_ids ?? [],
+      pljucni_avtomat_ids: row.pljucni_avtomat_ids ?? [],
     });
     setOpen(true);
   };
@@ -132,8 +136,10 @@ export default function IdaSeznamVozil() {
 
     const payload = {
       vozilo: form.vozilo.trim() || null,
-      hrbtisce_id: form.hrbtisce_id || null,
-      pljucni_avtomat_id: form.pljucni_avtomat_id || null,
+      hrbtisce_ids: form.hrbtisce_ids,
+      pljucni_avtomat_ids: form.pljucni_avtomat_ids,
+      hrbtisce_id: null,
+      pljucni_avtomat_id: null,
     };
 
     setSaving(true);
@@ -160,6 +166,9 @@ export default function IdaSeznamVozil() {
 
   const hrbLabel = (h: Hrb) => h.serijska_st ? `${h.serijska_st} (${h.interna_st})` : h.interna_st;
   const paLabel = (a: PA) => a.serijska_st ? `${a.serijska_st}${a.naziv ? ` (${a.naziv})` : ""}` : (a.naziv ?? "—");
+
+  const toggle = (arr: string[], id: string) =>
+    arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id];
 
   return (
     <AppShell>
@@ -216,13 +225,25 @@ export default function IdaSeznamVozil() {
                 </TableRow>
               ) : (
                 visible.map((r) => {
-                  const hrb = r.hrbtisce_id ? hrbMap.get(r.hrbtisce_id) : null;
-                  const pa = r.pljucni_avtomat_id ? paMap.get(r.pljucni_avtomat_id) : null;
+                  const hrbs = (r.hrbtisce_ids ?? []).map((id) => hrbMap.get(id)).filter(Boolean) as Hrb[];
+                  const pas = (r.pljucni_avtomat_ids ?? []).map((id) => paMap.get(id)).filter(Boolean) as PA[];
                   return (
                     <TableRow key={r.id}>
                       <TableCell className="font-medium">{r.vozilo || "—"}</TableCell>
-                      <TableCell>{hrb ? hrbLabel(hrb) : "—"}</TableCell>
-                      <TableCell>{pa ? paLabel(pa) : "—"}</TableCell>
+                      <TableCell>
+                        {hrbs.length === 0 ? "—" : (
+                          <div className="flex flex-wrap gap-1">
+                            {hrbs.map((h) => <Badge key={h.id} variant="secondary">{hrbLabel(h)}</Badge>)}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {pas.length === 0 ? "—" : (
+                          <div className="flex flex-wrap gap-1">
+                            {pas.map((a) => <Badge key={a.id} variant="secondary">{paLabel(a)}</Badge>)}
+                          </div>
+                        )}
+                      </TableCell>
                       {allowed && (
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
@@ -271,37 +292,71 @@ export default function IdaSeznamVozil() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="hrbtisce">Hrbtišče (serijska št.)</Label>
-                  <Select
-                    value={form.hrbtisce_id || NONE}
-                    onValueChange={(v) => setForm((p) => ({ ...p, hrbtisce_id: v === NONE ? "" : v }))}
-                  >
-                    <SelectTrigger id="hrbtisce">
-                      <SelectValue placeholder="Izberi hrbtišče" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={NONE}>—</SelectItem>
-                      {hrbtisca.map((h) => (
-                        <SelectItem key={h.id} value={h.id}>{hrbLabel(h)}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button id="hrbtisce" type="button" variant="outline" className="w-full justify-start font-normal h-auto min-h-10 py-2">
+                        {form.hrbtisce_ids.length === 0 ? (
+                          <span className="text-muted-foreground">Izberi hrbtišča</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1">
+                            {form.hrbtisce_ids.map((id) => {
+                              const h = hrbMap.get(id);
+                              return h ? <Badge key={id} variant="secondary">{hrbLabel(h)}</Badge> : null;
+                            })}
+                          </div>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-1 max-h-72 overflow-y-auto">
+                      {hrbtisca.length === 0 ? (
+                        <p className="text-sm text-muted-foreground p-2">Ni hrbtišč.</p>
+                      ) : hrbtisca.map((h) => {
+                        const sel = form.hrbtisce_ids.includes(h.id);
+                        return (
+                          <button key={h.id} type="button"
+                            onClick={() => setForm((p) => ({ ...p, hrbtisce_ids: toggle(p.hrbtisce_ids, h.id) }))}
+                            className="flex items-center w-full text-left px-2 py-1.5 rounded text-sm hover:bg-accent">
+                            <Check className={`h-4 w-4 mr-2 ${sel ? "opacity-100" : "opacity-0"}`} />
+                            {hrbLabel(h)}
+                          </button>
+                        );
+                      })}
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="pa">Pljučni avtomat (serijska št.)</Label>
-                  <Select
-                    value={form.pljucni_avtomat_id || NONE}
-                    onValueChange={(v) => setForm((p) => ({ ...p, pljucni_avtomat_id: v === NONE ? "" : v }))}
-                  >
-                    <SelectTrigger id="pa">
-                      <SelectValue placeholder="Izberi pljučni avtomat" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={NONE}>—</SelectItem>
-                      {avtomati.map((a) => (
-                        <SelectItem key={a.id} value={a.id}>{paLabel(a)}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button id="pa" type="button" variant="outline" className="w-full justify-start font-normal h-auto min-h-10 py-2">
+                        {form.pljucni_avtomat_ids.length === 0 ? (
+                          <span className="text-muted-foreground">Izberi pljučne avtomate</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1">
+                            {form.pljucni_avtomat_ids.map((id) => {
+                              const a = paMap.get(id);
+                              return a ? <Badge key={id} variant="secondary">{paLabel(a)}</Badge> : null;
+                            })}
+                          </div>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-1 max-h-72 overflow-y-auto">
+                      {avtomati.length === 0 ? (
+                        <p className="text-sm text-muted-foreground p-2">Ni pljučnih avtomatov.</p>
+                      ) : avtomati.map((a) => {
+                        const sel = form.pljucni_avtomat_ids.includes(a.id);
+                        return (
+                          <button key={a.id} type="button"
+                            onClick={() => setForm((p) => ({ ...p, pljucni_avtomat_ids: toggle(p.pljucni_avtomat_ids, a.id) }))}
+                            className="flex items-center w-full text-left px-2 py-1.5 rounded text-sm hover:bg-accent">
+                            <Check className={`h-4 w-4 mr-2 ${sel ? "opacity-100" : "opacity-0"}`} />
+                            {paLabel(a)}
+                          </button>
+                        );
+                      })}
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
               <DialogFooter className="gap-2">

@@ -326,10 +326,12 @@ export type Database = {
         Row: {
           created_at: string
           hrbtisce_id: string | null
+          hrbtisce_ids: string[]
           id: string
           ida_aparat: string | null
           opombe: string | null
           pljucni_avtomat_id: string | null
+          pljucni_avtomat_ids: string[]
           updated_at: string
           user_id: string
           vozilo: string | null
@@ -337,10 +339,12 @@ export type Database = {
         Insert: {
           created_at?: string
           hrbtisce_id?: string | null
+          hrbtisce_ids?: string[]
           id?: string
           ida_aparat?: string | null
           opombe?: string | null
           pljucni_avtomat_id?: string | null
+          pljucni_avtomat_ids?: string[]
           updated_at?: string
           user_id: string
           vozilo?: string | null
@@ -348,10 +352,12 @@ export type Database = {
         Update: {
           created_at?: string
           hrbtisce_id?: string | null
+          hrbtisce_ids?: string[]
           id?: string
           ida_aparat?: string | null
           opombe?: string | null
           pljucni_avtomat_id?: string | null
+          pljucni_avtomat_ids?: string[]
           updated_at?: string
           user_id?: string
           vozilo?: string | null
