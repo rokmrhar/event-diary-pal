@@ -163,11 +163,12 @@ Deno.serve(async (req) => {
 
     // 4. Connect SMTP
     const port = settings.smtp_port ?? 587;
+    const useImplicitTls = port === 465 || (!!settings.smtp_secure && port !== 587 && port !== 25 && port !== 2525);
     const client = new SMTPClient({
       connection: {
         hostname: settings.smtp_host,
         port,
-        tls: !!settings.smtp_secure,
+        tls: useImplicitTls,
         auth: settings.smtp_user && settings.smtp_pass ? { username: settings.smtp_user, password: settings.smtp_pass } : undefined,
       },
     });
