@@ -72,11 +72,13 @@ Deno.serve(async (req) => {
         });
       }
       const port = settings.smtp_port ?? 587;
+      // Auto-detect TLS mode: port 465 = implicit TLS, others (587/25/2525) = STARTTLS (tls:false)
+      const useImplicitTls = port === 465 || (!!settings.smtp_secure && port !== 587 && port !== 25 && port !== 2525);
       const client = new SMTPClient({
         connection: {
           hostname: settings.smtp_host,
           port,
-          tls: !!settings.smtp_secure,
+          tls: useImplicitTls,
           auth: settings.smtp_user && settings.smtp_pass ? { username: settings.smtp_user, password: settings.smtp_pass } : undefined,
         },
       });
@@ -93,7 +95,7 @@ Deno.serve(async (req) => {
             <p>To je preizkusno sporočilo iz PGD aplikacije.</p>
             <p>Če ste ga prejeli, so SMTP nastavitve pravilne. ✅</p>
             <hr>
-            <p style="color:#666;font-size:12px">Strežnik: ${settings.smtp_host}:${port}</p>
+            <p style="color:#666;font-size:12px">Strežnik: ${settings.smtp_host}:${port} (${useImplicitTls ? "TLS" : "STARTTLS"})</p>
           `,
         });
         await client.close();
@@ -101,7 +103,11 @@ Deno.serve(async (req) => {
           status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
+        let msg = e instanceof Error ? e.message : String(e);
+        if (msg.includes("InvalidContentType") || msg.includes("corrupt message")) {
+          msg = `Napaka TLS rokovanja (${msg}). Preveri kombinacijo port/SSL: port 465 = SSL/TLS vklopljen; port 587 ali 25 = SSL/TLS izklopljen (uporabi STARTTLS).`;
+        }
+        console.error("SMTP test send failed:", msg);
         try { await client.close(); } catch { /* ignore */ }
         return new Response(JSON.stringify({ ok: false, error: msg }), {
           status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
