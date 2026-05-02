@@ -266,7 +266,7 @@ export default function Vozila() {
                       {v.znamka || "—"} {v.model ? `• ${v.model}` : ""}
                     </div>
                     <div className="flex flex-wrap gap-1.5 pt-1">
-                      <Badge variant="outline" className="text-xs"><Wrench className="h-3 w-3 mr-1" /> {svcCount} servisov</Badge>
+                      <Badge variant="outline" className="text-xs"><Wrench className="h-3 w-3 mr-1" /> Št. servisov: {svcCount}</Badge>
                       {insp?.naslednji_pregled && (
                         <Badge variant="outline" className="text-xs"><ClipboardCheck className="h-3 w-3 mr-1" /> Naslednji TP: {formatDateSI(insp.naslednji_pregled)}</Badge>
                       )}
