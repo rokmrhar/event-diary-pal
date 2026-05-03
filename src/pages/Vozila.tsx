@@ -18,8 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { Truck, Plus, Pencil, Trash2, Wrench, ClipboardCheck, ArrowLeft, Lock } from "lucide-react";
-import { Button } from "@/components/ui/button";                   
+import { Truck, Plus, Pencil, Trash2, Wrench, ClipboardCheck, ArrowLeft, Lock } from "lucide-react";                  
 import { formatDateSI } from "@/lib/format";
 
 type Vehicle = {
