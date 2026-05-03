@@ -13,6 +13,9 @@ export default function Servisi() {
     <AppShell>
       <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
+           <Button asChild variant="ghost" size="sm">
+              <Link to="/"><ArrowLeft className="h-4 w-4 mr-1" /> Domov</Link>
+            </Button>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
               <Wrench className="h-7 w-7 text-brand-red" /> SERVISI
