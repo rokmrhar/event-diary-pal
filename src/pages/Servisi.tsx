@@ -13,11 +13,9 @@ export default function Servisi() {
     <AppShell>
       <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
-          <Wrench className="h-7 w-7 text-brand-red" />
           <div>
-            
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
-             SERVISI
+              <Wrench className="h-7 w-7 text-brand-red" /> SERVISI
             </h1>
             <p className="text-sm text-muted-foreground">Izberi evidenco</p>
           </div>
