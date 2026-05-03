@@ -218,7 +218,7 @@ export default function Vozila() {
   return (
     <AppShell>
       <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-4">
-        <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items justify-between flex-wrap gap-3">
           <Button asChild variant="ghost" size="sm">
               <Link to="/"><ArrowLeft className="h-4 w-4 mr-1" /> Domov</Link>
             </Button>
