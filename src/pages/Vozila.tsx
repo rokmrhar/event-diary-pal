@@ -222,8 +222,8 @@ export default function Vozila() {
           <Button asChild variant="ghost" size="sm">
               <Link to="/"><ArrowLeft className="h-4 w-4 mr-1" /> Domov</Link>
             </Button>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
-              <Truck className="h-7 w-7 text-brand-red" /> VOZILA
+          <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
+            <Truck className="h-7 w-7 text-brand-red" /> VOZILA
           </h1>
           {allowed && (
             <Button onClick={openCreate} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
