@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Truck, Plus, Pencil, Trash2, Wrench, ClipboardCheck, ArrowLeft, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";                   
 import { formatDateSI } from "@/lib/format";
 
 type Vehicle = {
@@ -219,6 +220,9 @@ export default function Vozila() {
     <AppShell>
       <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
+          <Button asChild variant="ghost" size="sm">
+              <Link to="/"><ArrowLeft className="h-4 w-4 mr-1" /> Domov</Link>
+            </Button>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
               <Truck className="h-7 w-7 text-brand-red" /> VOZILA
           </h1>
