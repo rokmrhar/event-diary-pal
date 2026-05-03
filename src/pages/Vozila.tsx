@@ -219,8 +219,8 @@ export default function Vozila() {
     <AppShell>
       <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Truck className="h-6 w-6 text-brand-red" /> Vozila
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
+              <Truck className="h-7 w-7 text-brand-red" /> VOZILA
           </h1>
           {allowed && (
             <Button onClick={openCreate} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
