@@ -143,7 +143,7 @@ export default function EvidencaIntervencijApp() {
 
   return (
     <AppShell>
-      <div className="max-w-md md:max-w-2xl lg:max-w-3xl mx-auto p-3 sm:p-6 lg:p-8 space-y-4">
+      <div className="max-w-md md:max-w-2xl lg:max-w-3xl mx-auto p-3 sm:p-6 lg:p-8 space-y-4 pb-24">
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-xl sm:text-2xl font-bold tracking-wide uppercase text-foreground">
             Poročilo o intervenciji
