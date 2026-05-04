@@ -140,13 +140,13 @@ export default function AppShell({ children }: AppShellProps) {
             );
           })}
         
-          {/* Section label — before last 2 items */}
+          {/* Section label — before last 1 items */}
           <div className="px-4 py-2 flex items-center gap-2 text-xs uppercase text-white/50">
           <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
             V IZDELAVI
           </div>
         
-          {sidebarItems.slice(-1).map((item) => {
+          {sidebarItems.slice(0, -1).map((item) => {
             const inner = (
               <>
                 <item.icon className="h-4 w-4 text-brand-red shrink-0" />
