@@ -44,8 +44,8 @@ const sidebarItems: SidebarItem[] = [
   { icon: ShieldCheck, label: "EVIDENCA IDA", to: "/ida" },
   { icon: Biohazard, label: "EVIDENCA PRANJ", to: "/pranja" },
   { icon: BarChart3, label: "STATISTIKA", to: "/statistika" },
-  { icon: Flame, label: "POŽARNE STRAŽE" },
   { icon: ClipboardList, label: "POTNI NALOG", to: "/potni-nalog" },
+  { icon: Flame, label: "POŽARNE STRAŽE" },
 ];
 
 export default function AppShell({ children }: AppShellProps) {
@@ -146,7 +146,7 @@ export default function AppShell({ children }: AppShellProps) {
             V IZDELAVI
           </div>
         
-          {sidebarItems.slice(-2).map((item) => {
+          {sidebarItems.slice(-1).map((item) => {
             const inner = (
               <>
                 <item.icon className="h-4 w-4 text-brand-red shrink-0" />
