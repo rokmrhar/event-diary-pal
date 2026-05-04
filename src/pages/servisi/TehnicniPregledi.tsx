@@ -131,7 +131,7 @@ export default function TehnicniPregledi() {
     if (!next) return null;
     if (next < today) return <Badge variant="destructive" className="text-xs">Potekel</Badge>;
     const days = Math.ceil((new Date(next).getTime() - new Date(today).getTime()) / 86400000);
-    if (days <= 30) return <Badge className="text-xs bg-amber-500 text-white">Poteka kmalu</Badge>;
+    if (days <= 30) return <Badge className="text-xs bg-amber-500 text-white">Poteče kmalu</Badge>;
     return <Badge variant="outline" className="text-xs">Veljaven</Badge>;
   };
 
