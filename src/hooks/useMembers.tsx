@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type Member = { id: string; name: string };
+export type Member = { id: string; name: string; licenca_b?: boolean; licenca_c?: boolean };
 
 export function useMembers() {
   const [members, setMembers] = useState<Member[]>([]);
@@ -11,7 +11,7 @@ export function useMembers() {
     setLoading(true);
     const { data, error } = await supabase
       .from("members")
-      .select("id, name");
+      .select("id, name, licenca_b, licenca_c");
     if (!error && data) {
       const sorted = [...(data as Member[])].sort((a, b) =>
         getSurname(a.name).localeCompare(getSurname(b.name), "sl") ||

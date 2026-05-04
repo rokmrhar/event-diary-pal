@@ -1,9 +1,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import nodemailer from "npm:nodemailer@6.9.14";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 interface Settings {
@@ -36,21 +37,57 @@ function daysBetween(iso: string): number {
   return Math.round((target.getTime() - today.getTime()) / 86400000);
 }
 
+function buildTransporter(settings: Settings) {
+  const port = settings.smtp_port ?? 587;
+  // 465 = implicit TLS (secure: true). 587/25/2525 = STARTTLS (secure: false, requireTLS: true).
+  const secure = port === 465 || (!!settings.smtp_secure && port !== 587 && port !== 25 && port !== 2525);
+  // deno-lint-ignore no-explicit-any
+  return (nodemailer as any).createTransport({
+    host: settings.smtp_host!,
+    port,
+    secure,
+    requireTLS: !secure,
+    auth: settings.smtp_user && settings.smtp_pass
+      ? { user: settings.smtp_user, pass: settings.smtp_pass }
+      : undefined,
+    tls: { rejectUnauthorized: false },
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
+    socketTimeout: 20000,
+  });
+}
+
+function friendlyError(raw: string): string {
+  if (raw.includes("wrong version number") || raw.includes("InvalidContentType") || raw.includes("corrupt message")) {
+    return `${raw} — Preveri kombinacijo port/SSL: port 465 = SSL/TLS vklopljen; port 587 ali 25 = SSL/TLS izklopljen (STARTTLS).`;
+  }
+  if (raw.includes("ETIMEDOUT") || raw.includes("ECONNREFUSED")) {
+    return `${raw} — Strežnik ne sprejema povezave. Preveri host in port.`;
+  }
+  if (raw.toLowerCase().includes("invalid login") || raw.includes("535")) {
+    return `${raw} — Neveljavno uporabniško ime ali geslo.`;
+  }
+  return raw;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    // Parse optional body for test mode
     let body: { test?: boolean; recipient?: string } = {};
     if (req.method === "POST") {
       try { body = await req.json(); } catch { body = {}; }
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl || !serviceKey) {
+      return new Response(JSON.stringify({ ok: false, error: "Manjkajo strežniške nastavitve" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // 1. Load settings
     const { data: settings, error: sErr } = await supabase
       .from("app_settings")
       .select("smtp_host, smtp_port, smtp_user, smtp_pass, smtp_from, smtp_from_name, smtp_secure, reminder_recipients, reminder_days_before")
@@ -63,7 +100,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // TEST MODE: send a single test email to a chosen address
+    // TEST MODE
     if (body.test) {
       const to = (body.recipient ?? "").trim();
       if (!to.includes("@")) {
@@ -71,44 +108,34 @@ Deno.serve(async (req) => {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const port = settings.smtp_port ?? 587;
-      // Auto-detect TLS mode: port 465 = implicit TLS, others (587/25/2525) = STARTTLS (tls:false)
-      const useImplicitTls = port === 465 || (!!settings.smtp_secure && port !== 587 && port !== 25 && port !== 2525);
-      const client = new SMTPClient({
-        connection: {
-          hostname: settings.smtp_host,
-          port,
-          tls: useImplicitTls,
-          auth: settings.smtp_user && settings.smtp_pass ? { username: settings.smtp_user, password: settings.smtp_pass } : undefined,
-        },
-      });
+      const transporter = buildTransporter(settings);
       const fromName = settings.smtp_from_name || "PGD";
-      const from = `${fromName} <${settings.smtp_from}>`;
+      const from = `"${fromName}" <${settings.smtp_from}>`;
+      const port = settings.smtp_port ?? 587;
       try {
-        await client.send({
+        await transporter.verify();
+        await transporter.sendMail({
           from,
-          to: [to],
+          to,
           subject: "Testno sporočilo — PGD aplikacija",
-          content: "auto",
+          text: "Preizkusno sporočilo iz PGD aplikacije.",
           html: `
             <h2>Testno sporočilo</h2>
             <p>To je preizkusno sporočilo iz PGD aplikacije.</p>
             <p>Če ste ga prejeli, so SMTP nastavitve pravilne. ✅</p>
             <hr>
-            <p style="color:#666;font-size:12px">Strežnik: ${settings.smtp_host}:${port} (${useImplicitTls ? "TLS" : "STARTTLS"})</p>
+            <p style="color:#666;font-size:12px">Strežnik: ${settings.smtp_host}:${port}</p>
           `,
         });
-        await client.close();
+        try { transporter.close(); } catch { /* ignore */ }
         return new Response(JSON.stringify({ ok: true, message: `Testno sporočilo poslano na ${to}` }), {
           status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       } catch (e) {
-        let msg = e instanceof Error ? e.message : String(e);
-        if (msg.includes("InvalidContentType") || msg.includes("corrupt message")) {
-          msg = `Napaka TLS rokovanja (${msg}). Preveri kombinacijo port/SSL: port 465 = SSL/TLS vklopljen; port 587 ali 25 = SSL/TLS izklopljen (uporabi STARTTLS).`;
-        }
-        console.error("SMTP test send failed:", msg);
-        try { await client.close(); } catch { /* ignore */ }
+        const raw = e instanceof Error ? e.message : String(e);
+        const msg = friendlyError(raw);
+        console.error("SMTP test send failed:", raw);
+        try { transporter.close(); } catch { /* ignore */ }
         return new Response(JSON.stringify({ ok: false, error: msg }), {
           status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -123,7 +150,6 @@ Deno.serve(async (req) => {
     }
     const daysBefore = settings.reminder_days_before ?? 14;
 
-    // 2. Find checks expiring within window
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const cutoff = new Date(today);
@@ -146,7 +172,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 3. Filter out already-sent (per medical_check_id + naslednji_pregled)
     const ids = candidates.map((c) => c.id);
     const { data: logged } = await supabase
       .from("medical_reminder_log")
@@ -161,20 +186,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 4. Connect SMTP
-    const port = settings.smtp_port ?? 587;
-    const useImplicitTls = port === 465 || (!!settings.smtp_secure && port !== 587 && port !== 25 && port !== 2525);
-    const client = new SMTPClient({
-      connection: {
-        hostname: settings.smtp_host,
-        port,
-        tls: useImplicitTls,
-        auth: settings.smtp_user && settings.smtp_pass ? { username: settings.smtp_user, password: settings.smtp_pass } : undefined,
-      },
-    });
-
+    const transporter = buildTransporter(settings);
     const fromName = settings.smtp_from_name || "PGD";
-    const from = `${fromName} <${settings.smtp_from}>`;
+    const from = `"${fromName}" <${settings.smtp_from}>`;
 
     let sent = 0;
     for (const c of toSend) {
@@ -189,11 +203,11 @@ Deno.serve(async (req) => {
         <p style="color:#666;font-size:12px">Avtomatski opomnik aplikacije PGD.</p>
       `;
       try {
-        await client.send({
+        await transporter.sendMail({
           from,
-          to: recipients,
+          to: recipients.join(", "),
           subject,
-          content: "auto",
+          text: `Opomnik: zdravniški pregled za ${c.member_name} poteče ${fmtDate(c.naslednji_pregled)} (${dni} dni).`,
           html,
         });
         await supabase.from("medical_reminder_log").insert({
@@ -207,7 +221,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    await client.close();
+    try { transporter.close(); } catch { /* ignore */ }
 
     return new Response(JSON.stringify({ ok: true, sent, total: toSend.length }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },

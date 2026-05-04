@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import AppShell from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";                 
-import { Wrench, ClipboardCheck, ArrowLeft } from "lucide-react"; 
+import { Wrench, ClipboardCheck } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 const TILES = [
   { to: "/servisi/knjiga", label: "Knjiga servisov in popravil", icon: Wrench, desc: "Vsi servisi in popravila vozil" },
@@ -13,17 +13,7 @@ export default function Servisi() {
   return (
     <AppShell>
       <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center gap-3">
-           <Button asChild variant="ghost" size="sm">
-              <Link to="/"><ArrowLeft className="h-4 w-4 mr-1" /> Domov</Link>
-            </Button>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
-              <Wrench className="h-7 w-7 text-brand-red" /> SERVISI
-            </h1>
-            <p className="text-sm text-muted-foreground">Izberi evidenco</p>
-          </div>
-        </div>
+        <PageHeader title="Servisi" icon={Wrench} description="Izberi evidenco" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {TILES.map((t) => (
             <Link key={t.to} to={t.to} className="group">

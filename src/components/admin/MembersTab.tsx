@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pencil, Trash2, UserPlus, Check, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 
 export default function MembersTab() {
@@ -78,6 +79,12 @@ export default function MembersTab() {
     refresh();
   };
 
+  const toggleLicense = async (id: string, field: "licenca_b" | "licenca_c", value: boolean) => {
+    const { error } = await supabase.from("members").update({ [field]: value }).eq("id", id);
+    if (error) return toast({ title: "Napaka", description: error.message, variant: "destructive" });
+    refresh();
+  };
+
   return (
     <div className="space-y-4">
       <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-2">
@@ -105,13 +112,15 @@ export default function MembersTab() {
           <TableHeader>
             <TableRow>
               <TableHead>Ime in priimek</TableHead>
+              <TableHead className="text-center w-20">B izpit</TableHead>
+              <TableHead className="text-center w-20">C izpit</TableHead>
               <TableHead className="w-[160px] text-right">Dejanja</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                   Ni članov
                 </TableCell>
               </TableRow>
@@ -128,6 +137,20 @@ export default function MembersTab() {
                     ) : (
                       <span className="font-medium">{m.name}</span>
                     )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Checkbox
+                      checked={!!m.licenca_b}
+                      onCheckedChange={(c) => toggleLicense(m.id, "licenca_b", !!c)}
+                      aria-label={`B izpit za ${m.name}`}
+                    />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Checkbox
+                      checked={!!m.licenca_c}
+                      onCheckedChange={(c) => toggleLicense(m.id, "licenca_c", !!c)}
+                      aria-label={`C izpit za ${m.name}`}
+                    />
                   </TableCell>
                   <TableCell className="text-right">
                     {editId === m.id ? (
