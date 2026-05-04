@@ -37,6 +37,7 @@ const sidebarItems: SidebarItem[] = [
   { icon: ClipboardList, label: "POROČILO O INTERVENCIJI", to: "/intervencija" },
   { icon: PencilLine, label: "VNOS AKTIVNOSTI", to: "/aktivnost" },
   { icon: Archive, label: "ARHIV INTERVENCIJ", to: "/arhiv-intervencij" },
+  { icon: ClipboardList, label: "POTNI NALOG", to: "/potni-nalog" },
   { icon: AlertCircle, label: "DOGODEK VEČJEGA OBSEGA", to: "/vecji-obseg" },
   { icon: Wrench, label: "SERVISNA KNJIGA", to: "/servisi" },
   { icon: Truck, label: "VOZILA", to: "/vozila" },
@@ -44,7 +45,6 @@ const sidebarItems: SidebarItem[] = [
   { icon: ShieldCheck, label: "EVIDENCA IDA", to: "/ida" },
   { icon: Biohazard, label: "EVIDENCA PRANJ", to: "/pranja" },
   { icon: BarChart3, label: "STATISTIKA", to: "/statistika" },
-  { icon: ClipboardList, label: "POTNI NALOG", to: "/potni-nalog" },
   { icon: Flame, label: "POŽARNE STRAŽE" },
 ];
 
