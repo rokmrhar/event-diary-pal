@@ -120,7 +120,7 @@ export default function AppShell({ children }: AppShellProps) {
 
         {/* Nav items */}
         <nav className="flex-1 overflow-y-auto px-2 py-1 space-y-0.5 text-[11px] font-semibold">
-          {sidebarItems.slice(0, -2).map((item) => {
+          {sidebarItems.slice(-1).map((item) => {
             const inner = (
               <>
                 <item.icon className="h-4 w-4 text-brand-red shrink-0" />
@@ -146,7 +146,7 @@ export default function AppShell({ children }: AppShellProps) {
             V IZDELAVI
           </div>
         
-          {sidebarItems.slice(0, -1).map((item) => {
+          {sidebarItems.slice(-1).map((item) => {
             const inner = (
               <>
                 <item.icon className="h-4 w-4 text-brand-red shrink-0" />
