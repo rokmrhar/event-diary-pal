@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AppShell from "@/components/AppShell";
 import { useModulePermissions } from "@/hooks/useModulePermissions";
-import { Lock } from "lucide-react";
+import { Lock, Pencil } from "lucide-react";
 
 export default function EvidencaAktivnostiApp() {
   const { user } = useAuth();
@@ -108,10 +108,10 @@ export default function EvidencaAktivnostiApp() {
   return (
     <AppShell>
       <div className="max-w-md md:max-w-2xl lg:max-w-3xl mx-auto p-3 sm:p-6 lg:p-8 space-y-4">
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-wide uppercase text-foreground">
-            Evidenca aktivnosti
-          </h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
+              <Pencil className="h-7 w-7 text-brand-red" />
+              VNOS NOVE AKTIVNOSTI
+            </h1>
         </div>
 
         {!permLoading && !allowed && (
