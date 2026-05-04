@@ -34,6 +34,7 @@ type Vehicle = {
 };
 type Service = { id: string; vehicle_id: string; datum: string; opis: string };
 type Inspection = { id: string; vehicle_id: string; zadnji_pregled: string | null; naslednji_pregled: string | null };
+type Trip = { id: string; vehicle_id: string; datum: string; relacija_od: string; relacija_do: string; km_stevec: number | null; voznik: string };
 
 export default function Vozila() {
   const { user } = useAuth();
@@ -43,6 +44,7 @@ export default function Vozila() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [inspections, setInspections] = useState<Inspection[]>([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Vehicle | null>(null);
 
@@ -58,14 +60,16 @@ export default function Vozila() {
 
   const load = async () => {
     setLoading(true);
-    const [vRes, sRes, iRes] = await Promise.all([
+    const [vRes, sRes, iRes, tRes] = await Promise.all([
       supabase.from("vehicles").select("*").order("oznaka"),
       supabase.from("vehicle_services").select("id, vehicle_id, datum, opis"),
       supabase.from("vehicle_inspections").select("id, vehicle_id, zadnji_pregled, naslednji_pregled"),
+      supabase.from("vehicle_trips").select("id, vehicle_id, datum, relacija_od, relacija_do, km_stevec, voznik").order("datum", { ascending: false }),
     ]);
     setVehicles((vRes.data ?? []) as Vehicle[]);
     setServices((sRes.data ?? []) as Service[]);
     setInspections((iRes.data ?? []) as Inspection[]);
+    setTrips((tRes.data ?? []) as Trip[]);
     setLoading(false);
   };
 
@@ -143,6 +147,7 @@ export default function Vozila() {
   if (selected) {
     const svc = (servicesByVehicle[selected.id] ?? []).slice().sort((a, b) => b.datum.localeCompare(a.datum));
     const insp = inspByVehicle[selected.id];
+    const tr = trips.filter((t) => t.vehicle_id === selected.id);
     return (
       <AppShell>
         <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-4">
@@ -205,6 +210,31 @@ export default function Vozila() {
                         <span className="font-medium">{formatDateSI(s.datum)}</span>
                       </div>
                       <p className="text-muted-foreground">{s.opis}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6 space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h2 className="font-semibold flex items-center gap-2"><ClipboardCheck className="h-4 w-4 text-brand-red" /> Potni nalogi ({tr.length})</h2>
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/potni-nalog">Upravljaj potne naloge</Link>
+                </Button>
+              </div>
+              {tr.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Ni potnih nalogov.</p>
+              ) : (
+                <ul className="divide-y divide-border">
+                  {tr.map((t) => (
+                    <li key={t.id} className="py-2 text-sm flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span className="font-medium">{formatDateSI(t.datum)}</span>
+                      <span className="text-muted-foreground">{t.relacija_od} → {t.relacija_do}</span>
+                      {t.km_stevec !== null && <span className="text-xs text-muted-foreground">{t.km_stevec} km</span>}
+                      <span className="ml-auto text-muted-foreground">{t.voznik}</span>
                     </li>
                   ))}
                 </ul>
