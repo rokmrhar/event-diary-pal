@@ -146,7 +146,7 @@ export default function EvidencaIntervencijApp() {
       <div className="max-w-md md:max-w-2xl lg:max-w-3xl mx-auto p-3 sm:p-6 lg:p-8 space-y-4 pb-24">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
           <Clipboard className="h-7 w-7 text-brand-red" />
-          NOVA INTERVENCIJE
+          NOVA INTERVENCIJA
         </h1>
 
         {!permLoading && !allowed && (
