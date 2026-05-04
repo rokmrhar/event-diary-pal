@@ -20,6 +20,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { Truck, Plus, Pencil, Trash2, Wrench, ClipboardCheck, ArrowLeft, Lock } from "lucide-react";                  
 import { formatDateSI } from "@/lib/format";
+import PageHeader from "@/components/PageHeader";
 
 type Vehicle = {
   id: string;
@@ -218,16 +219,18 @@ export default function Vozila() {
   return (
     <AppShell>
       <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-4">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
-            <Truck className="h-7 w-7 text-brand-red" /> VOZILA
-          </h1>
-          {allowed && (
-            <Button onClick={openCreate} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
-              <Plus className="h-4 w-4 mr-1" /> Novo vozilo
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          title="Vozila"
+          icon={Truck}
+          description="Pregled in upravljanje voznega parka"
+          actions={
+            allowed && (
+              <Button onClick={openCreate} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
+                <Plus className="h-4 w-4 mr-1" /> Novo vozilo
+              </Button>
+            )
+          }
+        />
 
         {!allowed && (
           <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/40 text-sm text-muted-foreground">

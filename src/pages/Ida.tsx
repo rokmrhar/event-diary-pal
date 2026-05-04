@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import AppShell from "@/components/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShieldCheck, Wind, Droplets, Cylinder, Stethoscope, Gauge } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 const TILES = [
   { to: "/ida/maske", label: "Maske", icon: Wind, desc: "Evidenca obraznih mask" },
@@ -16,17 +17,7 @@ export default function Ida() {
   return (
     <AppShell>
       <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-brand-red flex items-center justify-center text-brand-red-foreground">
-            <ShieldCheck className="h-7 w-7 text-brand-red" />
-          </div>
-          <div>
-            <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl sm:text-3xl font-bold tracking-tight uppercase flex items-center gap-2">
-             IDA
-          </h1>
-            <p className="text-sm text-muted-foreground">Izberi evidenco</p>
-          </div>
-        </div>
+        <PageHeader title="IDA" icon={ShieldCheck} description="Izberi evidenco" />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {TILES.map((t) => (

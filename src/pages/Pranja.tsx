@@ -2,17 +2,13 @@ import { Link } from "react-router-dom";
 import AppShell from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Biohazard, Plus, Archive } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 export default function Pranja() {
   return (
     <AppShell>
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        <div className="flex items-center gap-3">
-          <Biohazard className="h-7 w-7 text-brand-red" />
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase">
-            Evidenca pranj
-          </h1>
-        </div>
+      <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
+        <PageHeader title="Evidenca pranj" icon={Biohazard} description="Vnos in pregled pranj opreme" />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Link to="/pranja/vnos" className="block group">

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft, Lock, Pencil, Plus, Stethoscope, Trash2 } from "lucide-react";
+import { Lock, Pencil, Plus, Stethoscope, Trash2 } from "lucide-react";
 import AppShell from "@/components/AppShell";
+import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -151,22 +151,17 @@ export default function ZdravniskiPregledi() {
   return (
     <AppShell>
       <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-4">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/"><ArrowLeft className="h-4 w-4 mr-1" /> Domov</Link>
-            </Button>
-            <div className="h-10 w-10 rounded-full bg-brand-red flex items-center justify-center text-brand-red-foreground">
-              <Stethoscope className="h-5 w-5" />
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Zdravniški pregledi</h1>
-          </div>
-          {allowed && (
-            <Button onClick={openCreate} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
-              <Plus className="h-4 w-4 mr-1" /> Dodaj zapis
-            </Button>
-          )}
-        </div>
+        <PageHeader
+          title="Zdravniški pregledi"
+          icon={Stethoscope}
+          actions={
+            allowed && (
+              <Button onClick={openCreate} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
+                <Plus className="h-4 w-4 mr-1" /> Dodaj zapis
+              </Button>
+            )
+          }
+        />
 
         {!allowed && (
           <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/40 text-sm text-muted-foreground">
