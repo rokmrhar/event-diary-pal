@@ -61,7 +61,7 @@ export default function EvidencaIntervencijApp() {
     setTrajanjeDo("");
     setCasPolneUre("");
     setNaziv("");
-    setSkupina("VSA OPERATIVA");
+    setSkupina("VSA");
     setObcina("sempeter");
     setObcinaDrugo("");
     setVodja("");
@@ -148,7 +148,6 @@ export default function EvidencaIntervencijApp() {
           <Clipboard className="h-7 w-7 text-brand-red" />
           NOVA INTERVENCIJE
         </h1>
-        </div>
 
         {!permLoading && !allowed && (
           <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-2">
@@ -162,144 +161,144 @@ export default function EvidencaIntervencijApp() {
         )}
 
         {allowed && (
-        <form
-          onSubmit={handleSubmit}
-          className="bg-card text-card-foreground rounded-2xl shadow-sm border border-border p-4 sm:p-6 space-y-5"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="stevilka">ŠT. POROČILA</Label>
-              <Input id="stevilka" placeholder="npr. 17/2026" value={stevilka} onChange={(e) => setStevilka(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="datum">DATUM *</Label>
-              <DatePickerSI id="datum" value={datum} onChange={setDatum} required />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="trajanjeOd">TRAJANJE OD *</Label>
-              <Input id="trajanjeOd" type="time" value={trajanjeOd} onChange={(e) => setTrajanjeOd(e.target.value)} required />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="trajanjeDo">TRAJANJE DO *</Label>
-              <Input id="trajanjeDo" type="time" value={trajanjeDo} onChange={(e) => setTrajanjeDo(e.target.value)} required />
-            </div>
-            <div className="space-y-1.5 col-span-2 md:col-span-1">
-              <Label htmlFor="casPolneUre">ČAS (h, polne ure)</Label>
-              <Input id="casPolneUre" placeholder="npr. 1" value={casPolneUre} onChange={(e) => setCasPolneUre(e.target.value)} />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="naziv">NAZIV INTERVENCIJE *</Label>
-            <Input id="naziv" placeholder="npr. Tehnična pomoč" value={naziv} onChange={(e) => setNaziv(e.target.value)} required />
-          </div>
-
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-medium mb-2">SKUPINA *</legend>
-            <RadioGroup value={skupina} onValueChange={setSkupina} className="flex flex-wrap gap-3">
-              {SKUPINE.map((s) => (
-                <div key={s} className="flex items-center gap-2">
-                  <RadioGroupItem value={s} id={`sk-${s}`} />
-                  <Label htmlFor={`sk-${s}`} className="font-normal">{s}</Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </fieldset>
-
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-medium mb-2">OBČINA *</legend>
-            <RadioGroup value={obcina} onValueChange={(v) => setObcina(v as "sempeter" | "drugo")} className="space-y-2">
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="sempeter" id="o-sempeter" />
-                <Label htmlFor="o-sempeter" className="font-normal">Šempeter – Vrtojba</Label>
+          <form
+            onSubmit={handleSubmit}
+            className="bg-card text-card-foreground rounded-2xl shadow-sm border border-border p-4 sm:p-6 space-y-5"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="stevilka">ŠT. POROČILA</Label>
+                <Input id="stevilka" placeholder="npr. 17/2026" value={stevilka} onChange={(e) => setStevilka(e.target.value)} />
               </div>
-              <div className="flex items-center gap-2">
-                <RadioGroupItem value="drugo" id="o-drugo" />
-                <Label htmlFor="o-drugo" className="font-normal">Druga:</Label>
-                <Input
-                  className="flex-1 h-9"
-                  placeholder="Vnesi občino"
-                  value={obcinaDrugo}
-                  onChange={(e) => setObcinaDrugo(e.target.value)}
-                  onFocus={() => setObcina("drugo")}
-                />
+              <div className="space-y-1.5">
+                <Label htmlFor="datum">DATUM *</Label>
+                <DatePickerSI id="datum" value={datum} onChange={setDatum} required />
               </div>
-            </RadioGroup>
-          </fieldset>
+            </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="vodja">VODJA INTERVENCIJE *</Label>
-            <Select value={vodja} onValueChange={setVodja}>
-              <SelectTrigger id="vodja">
-                <SelectValue placeholder="Izberi vodjo" />
-              </SelectTrigger>
-              <SelectContent>
-                {members.map((m) => (
-                  <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="trajanjeOd">TRAJANJE OD *</Label>
+                <Input id="trajanjeOd" type="time" value={trajanjeOd} onChange={(e) => setTrajanjeOd(e.target.value)} required />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="trajanjeDo">TRAJANJE DO *</Label>
+                <Input id="trajanjeDo" type="time" value={trajanjeDo} onChange={(e) => setTrajanjeDo(e.target.value)} required />
+              </div>
+              <div className="space-y-1.5 col-span-2 md:col-span-1">
+                <Label htmlFor="casPolneUre">ČAS (h, polne ure)</Label>
+                <Input id="casPolneUre" placeholder="npr. 1" value={casPolneUre} onChange={(e) => setCasPolneUre(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="naziv">NAZIV INTERVENCIJE *</Label>
+              <Input id="naziv" placeholder="npr. Tehnična pomoč" value={naziv} onChange={(e) => setNaziv(e.target.value)} required />
+            </div>
+
+            <fieldset className="space-y-2">
+              <legend className="text-sm font-medium mb-2">SKUPINA *</legend>
+              <RadioGroup value={skupina} onValueChange={setSkupina} className="flex flex-wrap gap-3">
+                {SKUPINE.map((s) => (
+                  <div key={s} className="flex items-center gap-2">
+                    <RadioGroupItem value={s} id={`sk-${s}`} />
+                    <Label htmlFor={`sk-${s}`} className="font-normal">{s}</Label>
+                  </div>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
+              </RadioGroup>
+            </fieldset>
 
-          <div className="space-y-2">
-            <div className="text-sm font-medium">VOZILA <span className="text-muted-foreground font-normal">({vozila.length})</span></div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border border-border rounded-xl p-3 text-sm bg-muted/50">
-              {VEHICLES.map((v) => (
-                <label key={v.tip} className="flex items-center gap-2 cursor-pointer">
-                  <Checkbox
-                    checked={vozila.includes(v.tip)}
-                    onCheckedChange={() => toggleVehicle(v.tip)}
-                    id={`v-${v.tip}`}
+            <fieldset className="space-y-2">
+              <legend className="text-sm font-medium mb-2">OBČINA *</legend>
+              <RadioGroup value={obcina} onValueChange={(v) => setObcina(v as "sempeter" | "drugo")} className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem value="sempeter" id="o-sempeter" />
+                  <Label htmlFor="o-sempeter" className="font-normal">Šempeter – Vrtojba</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem value="drugo" id="o-drugo" />
+                  <Label htmlFor="o-drugo" className="font-normal">Druga:</Label>
+                  <Input
+                    className="flex-1 h-9"
+                    placeholder="Vnesi občino"
+                    value={obcinaDrugo}
+                    onChange={(e) => setObcinaDrugo(e.target.value)}
+                    onFocus={() => setObcina("drugo")}
                   />
-                  <span className="font-medium">{v.tip}</span>
-                  <span className="text-muted-foreground text-xs">{v.znak}</span>
-                </label>
-              ))}
+                </div>
+              </RadioGroup>
+            </fieldset>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="vodja">VODJA INTERVENCIJE *</Label>
+              <Select value={vodja} onValueChange={setVodja}>
+                <SelectTrigger id="vodja">
+                  <SelectValue placeholder="Izberi vodjo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <div className="text-sm font-medium">PRISOTNI <span className="text-muted-foreground font-normal">({prisotni.length})</span></div>
-            <Input
-              placeholder="Išči osebo..."
-              value={iskanje}
-              onChange={(e) => setIskanje(e.target.value)}
-            />
-            <div className="max-h-64 md:max-h-80 overflow-auto grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border border-border rounded-xl p-3 text-sm bg-muted/50">
-              {filtered.length === 0 && (
-                <p className="text-muted-foreground text-center py-2 sm:col-span-2">Ni zadetkov</p>
-              )}
-              {filtered.map((m) => (
-                <label key={m.id} className="flex items-center gap-2 cursor-pointer">
-                  <Checkbox
-                    checked={prisotni.includes(m.name)}
-                    onCheckedChange={() => togglePerson(m.name)}
-                    id={`pi-${m.id}`}
-                  />
-                  <span>{m.name}</span>
-                </label>
-              ))}
+            <div className="space-y-2">
+              <div className="text-sm font-medium">VOZILA <span className="text-muted-foreground font-normal">({vozila.length})</span></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border border-border rounded-xl p-3 text-sm bg-muted/50">
+                {VEHICLES.map((v) => (
+                  <label key={v.tip} className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={vozila.includes(v.tip)}
+                      onCheckedChange={() => toggleVehicle(v.tip)}
+                      id={`v-${v.tip}`}
+                    />
+                    <span className="font-medium">{v.tip}</span>
+                    <span className="text-muted-foreground text-xs">{v.znak}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="opombe">OPOMBE</Label>
-            <Textarea
-              id="opombe"
-              placeholder="Dodatne opombe..."
-              className="min-h-24"
-              value={opombe}
-              onChange={(e) => setOpombe(e.target.value)}
-            />
-          </div>
+            <div className="space-y-2">
+              <div className="text-sm font-medium">PRISOTNI <span className="text-muted-foreground font-normal">({prisotni.length})</span></div>
+              <Input
+                placeholder="Išči osebo..."
+                value={iskanje}
+                onChange={(e) => setIskanje(e.target.value)}
+              />
+              <div className="max-h-64 md:max-h-80 overflow-auto grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border border-border rounded-xl p-3 text-sm bg-muted/50">
+                {filtered.length === 0 && (
+                  <p className="text-muted-foreground text-center py-2 sm:col-span-2">Ni zadetkov</p>
+                )}
+                {filtered.map((m) => (
+                  <label key={m.id} className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={prisotni.includes(m.name)}
+                      onCheckedChange={() => togglePerson(m.name)}
+                      id={`pi-${m.id}`}
+                    />
+                    <span>{m.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
 
-          <Button type="submit" className="w-full rounded-2xl h-12 text-base font-semibold" disabled={saving}>
-            {saving ? "Shranjujem..." : "Shrani intervencijo"}
-          </Button>
-        </form>
+            <div className="space-y-1.5">
+              <Label htmlFor="opombe">OPOMBE</Label>
+              <Textarea
+                id="opombe"
+                placeholder="Dodatne opombe..."
+                className="min-h-24"
+                value={opombe}
+                onChange={(e) => setOpombe(e.target.value)}
+              />
+            </div>
+
+            <Button type="submit" className="w-full rounded-2xl h-12 text-base font-semibold" disabled={saving}>
+              {saving ? "Shranjujem..." : "Shrani intervencijo"}
+            </Button>
+          </form>
         )}
       </div>
     </AppShell>
