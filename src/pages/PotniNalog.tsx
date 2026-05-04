@@ -180,7 +180,7 @@ export default function PotniNalog() {
                   </Select>
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
-                  <Label>Opombe</Label>
+                  <Label>Namen</Label>
                   <Textarea rows={2} value={fOpombe} onChange={(e) => setFOpombe(e.target.value)} />
                 </div>
               </div>
