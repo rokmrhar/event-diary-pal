@@ -673,18 +673,24 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          licenca_b: boolean
+          licenca_c: boolean
           name: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
+          licenca_b?: boolean
+          licenca_c?: boolean
           name: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
+          licenca_b?: boolean
+          licenca_c?: boolean
           name?: string
           updated_at?: string
         }
@@ -917,6 +923,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vehicle_trips: {
+        Row: {
+          created_at: string
+          datum: string
+          id: string
+          km_stevec: number | null
+          opombe: string | null
+          relacija_do: string
+          relacija_od: string
+          updated_at: string
+          user_id: string
+          vehicle_id: string
+          voznik: string
+        }
+        Insert: {
+          created_at?: string
+          datum: string
+          id?: string
+          km_stevec?: number | null
+          opombe?: string | null
+          relacija_do: string
+          relacija_od: string
+          updated_at?: string
+          user_id: string
+          vehicle_id: string
+          voznik: string
+        }
+        Update: {
+          created_at?: string
+          datum?: string
+          id?: string
+          km_stevec?: number | null
+          opombe?: string | null
+          relacija_do?: string
+          relacija_od?: string
+          updated_at?: string
+          user_id?: string
+          vehicle_id?: string
+          voznik?: string
+        }
+        Relationships: []
       }
       vehicles: {
         Row: {
