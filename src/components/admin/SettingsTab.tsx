@@ -19,14 +19,18 @@ type Settings = {
   smtp_secure: boolean | null;
   reminder_recipients: string[] | null;
   reminder_days_before: number | null;
+  inspection_recipients: string[] | null;
+  inspection_days_before: number | null;
 };
 
 export default function SettingsTab() {
   const [s, setS] = useState<Settings | null>(null);
   const [recipientsText, setRecipientsText] = useState("");
+  const [inspRecipientsText, setInspRecipientsText] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [testingInsp, setTestingInsp] = useState(false);
   const [testEmail, setTestEmail] = useState("");
   const [sendingTest, setSendingTest] = useState(false);
 
@@ -41,6 +45,7 @@ export default function SettingsTab() {
     if (data) {
       setS(data as Settings);
       setRecipientsText(((data as Settings).reminder_recipients ?? []).join("\n"));
+      setInspRecipientsText(((data as Settings).inspection_recipients ?? []).join("\n"));
     }
     setLoading(false);
   };
@@ -52,10 +57,9 @@ export default function SettingsTab() {
   const save = async () => {
     if (!s) return;
     setSaving(true);
-    const recipients = recipientsText
-      .split(/[\n,;]+/)
-      .map((e) => e.trim())
-      .filter((e) => e.includes("@"));
+    const parseEmails = (txt: string) => txt.split(/[\n,;]+/).map((e) => e.trim()).filter((e) => e.includes("@"));
+    const recipients = parseEmails(recipientsText);
+    const inspRecipients = parseEmails(inspRecipientsText);
     const { error } = await supabase
       .from("app_settings")
       .update({
@@ -68,6 +72,8 @@ export default function SettingsTab() {
         smtp_secure: s.smtp_secure,
         reminder_recipients: recipients,
         reminder_days_before: s.reminder_days_before,
+        inspection_recipients: inspRecipients,
+        inspection_days_before: s.inspection_days_before,
       })
       .eq("id", s.id);
     setSaving(false);
@@ -80,6 +86,19 @@ export default function SettingsTab() {
     setTesting(true);
     const { data, error } = await supabase.functions.invoke("send-medical-reminders", { body: {} });
     setTesting(false);
+    if (error) return toast({ title: "Napaka", description: error.message, variant: "destructive" });
+    const r = data as { ok: boolean; sent?: number; message?: string; error?: string };
+    toast({
+      title: r.ok ? "Izvedeno" : "Težava",
+      description: r.message ?? r.error ?? `Poslano: ${r.sent ?? 0}`,
+      variant: r.ok ? "default" : "destructive",
+    });
+  };
+
+  const runInspectionsNow = async () => {
+    setTestingInsp(true);
+    const { data, error } = await supabase.functions.invoke("send-medical-reminders", { body: { mode: "inspections" } });
+    setTestingInsp(false);
     if (error) return toast({ title: "Napaka", description: error.message, variant: "destructive" });
     const r = data as { ok: boolean; sent?: number; message?: string; error?: string };
     toast({
@@ -191,12 +210,35 @@ export default function SettingsTab() {
         </div>
       </section>
 
+      <section className="space-y-3 border-t border-border pt-5">
+        <h2 className="text-lg font-semibold">Opomniki za tehnične preglede vozil</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label>Število dni pred pretekom</Label>
+            <Input
+              type="number"
+              min={1}
+              max={365}
+              value={s.inspection_days_before ?? 14}
+              onChange={(e) => update({ inspection_days_before: parseInt(e.target.value) || 14 })}
+            />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label>Prejemniki opomnikov za tehnične preglede (en e-mail na vrstico)</Label>
+            <Textarea rows={4} value={inspRecipientsText} onChange={(e) => setInspRecipientsText(e.target.value)} placeholder="serviser@pgd.si" />
+          </div>
+        </div>
+      </section>
+
       <div className="flex flex-wrap items-center gap-2 pt-2">
         <Button onClick={save} disabled={saving} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
           {saving ? "Shranjujem..." : "Shrani nastavitve"}
         </Button>
         <Button variant="outline" onClick={runNow} disabled={testing}>
           <Send className="h-4 w-4 mr-1" /> {testing ? "Pošiljam..." : "Pošlji opomnike zdaj"}
+        </Button>
+        <Button variant="outline" onClick={runInspectionsNow} disabled={testingInsp}>
+          <Send className="h-4 w-4 mr-1" /> {testingInsp ? "Pošiljam..." : "Pošlji tehnične opomnike"}
         </Button>
       </div>
     </div>
