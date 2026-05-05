@@ -267,7 +267,7 @@ export default function EvidencaIntervencijApp() {
                 value={iskanje}
                 onChange={(e) => setIskanje(e.target.value)}
               />
-              <div className="max-h-64 md:max-h-80 overflow-auto grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border border-border rounded-xl p-3 text-sm bg-muted/50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 border border-border rounded-xl p-3 text-sm bg-muted/50">
                 {filtered.length === 0 && (
                   <p className="text-muted-foreground text-center py-2 sm:col-span-2">Ni zadetkov</p>
                 )}

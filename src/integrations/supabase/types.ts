@@ -88,6 +88,8 @@ export type Database = {
       app_settings: {
         Row: {
           id: string
+          inspection_days_before: number | null
+          inspection_recipients: string[]
           reminder_days_before: number | null
           reminder_recipients: string[] | null
           smtp_from: string | null
@@ -101,6 +103,8 @@ export type Database = {
         }
         Insert: {
           id?: string
+          inspection_days_before?: number | null
+          inspection_recipients?: string[]
           reminder_days_before?: number | null
           reminder_recipients?: string[] | null
           smtp_from?: string | null
@@ -114,6 +118,8 @@ export type Database = {
         }
         Update: {
           id?: string
+          inspection_days_before?: number | null
+          inspection_recipients?: string[]
           reminder_days_before?: number | null
           reminder_recipients?: string[] | null
           smtp_from?: string | null
@@ -932,6 +938,7 @@ export type Database = {
           km_stevec: number | null
           opombe: string | null
           relacija_do: string
+          relacija_do2: string | null
           relacija_od: string
           updated_at: string
           user_id: string
@@ -945,6 +952,7 @@ export type Database = {
           km_stevec?: number | null
           opombe?: string | null
           relacija_do: string
+          relacija_do2?: string | null
           relacija_od: string
           updated_at?: string
           user_id: string
@@ -958,6 +966,7 @@ export type Database = {
           km_stevec?: number | null
           opombe?: string | null
           relacija_do?: string
+          relacija_do2?: string | null
           relacija_od?: string
           updated_at?: string
           user_id?: string

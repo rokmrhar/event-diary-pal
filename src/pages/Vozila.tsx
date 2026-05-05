@@ -34,7 +34,7 @@ type Vehicle = {
 };
 type Service = { id: string; vehicle_id: string; datum: string; opis: string };
 type Inspection = { id: string; vehicle_id: string; zadnji_pregled: string | null; naslednji_pregled: string | null };
-type Trip = { id: string; vehicle_id: string; datum: string; relacija_od: string; relacija_do: string; km_stevec: number | null; voznik: string };
+type Trip = { id: string; vehicle_id: string; datum: string; relacija_od: string; relacija_do: string; relacija_do2: string | null; km_stevec: number | null; voznik: string };
 
 export default function Vozila() {
   const { user } = useAuth();
@@ -64,7 +64,7 @@ export default function Vozila() {
       supabase.from("vehicles").select("*").order("oznaka"),
       supabase.from("vehicle_services").select("id, vehicle_id, datum, opis"),
       supabase.from("vehicle_inspections").select("id, vehicle_id, zadnji_pregled, naslednji_pregled"),
-      supabase.from("vehicle_trips").select("id, vehicle_id, datum, relacija_od, relacija_do, km_stevec, voznik").order("datum", { ascending: false }),
+      supabase.from("vehicle_trips").select("id, vehicle_id, datum, relacija_od, relacija_do, relacija_do2, km_stevec, voznik").order("datum", { ascending: false }),
     ]);
     setVehicles((vRes.data ?? []) as Vehicle[]);
     setServices((sRes.data ?? []) as Service[]);
@@ -232,7 +232,7 @@ export default function Vozila() {
                   {tr.map((t) => (
                     <li key={t.id} className="py-2 text-sm flex flex-wrap items-center gap-x-3 gap-y-1">
                       <span className="font-medium">{formatDateSI(t.datum)}</span>
-                      <span className="text-muted-foreground">{t.relacija_od} → {t.relacija_do}</span>
+                      <span className="text-muted-foreground">{t.relacija_od} → {t.relacija_do}{t.relacija_do2 ? ` → ${t.relacija_do2}` : ""}</span>
                       {t.km_stevec !== null && <span className="text-xs text-muted-foreground">{t.km_stevec} km</span>}
                       <span className="ml-auto text-muted-foreground">{t.voznik}</span>
                     </li>
