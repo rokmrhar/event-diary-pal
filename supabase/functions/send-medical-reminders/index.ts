@@ -17,6 +17,8 @@ interface Settings {
   smtp_secure: boolean | null;
   reminder_recipients: string[] | null;
   reminder_days_before: number | null;
+  inspection_recipients: string[] | null;
+  inspection_days_before: number | null;
 }
 
 interface Check {
@@ -74,7 +76,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    let body: { test?: boolean; recipient?: string } = {};
+    let body: { test?: boolean; recipient?: string; mode?: string } = {};
     if (req.method === "POST") {
       try { body = await req.json(); } catch { body = {}; }
     }
@@ -90,7 +92,7 @@ Deno.serve(async (req) => {
 
     const { data: settings, error: sErr } = await supabase
       .from("app_settings")
-      .select("smtp_host, smtp_port, smtp_user, smtp_pass, smtp_from, smtp_from_name, smtp_secure, reminder_recipients, reminder_days_before")
+      .select("smtp_host, smtp_port, smtp_user, smtp_pass, smtp_from, smtp_from_name, smtp_secure, reminder_recipients, reminder_days_before, inspection_recipients, inspection_days_before")
       .limit(1)
       .maybeSingle<Settings>();
     if (sErr) throw sErr;
@@ -140,6 +142,72 @@ Deno.serve(async (req) => {
           status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+    }
+
+    // INSPECTIONS MODE
+    if (body.mode === "inspections") {
+      const recipients = (settings.inspection_recipients ?? []).filter((e) => e && e.includes("@"));
+      if (recipients.length === 0) {
+        return new Response(JSON.stringify({ ok: false, message: "Ni prejemnikov za tehnične preglede" }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const daysBefore = settings.inspection_days_before ?? 14;
+      const today2 = new Date(); today2.setHours(0,0,0,0);
+      const cutoff2 = new Date(today2); cutoff2.setDate(cutoff2.getDate() + daysBefore);
+      const cutoffIso2 = cutoff2.toISOString().slice(0,10);
+      const todayIso2 = today2.toISOString().slice(0,10);
+
+      const { data: insp, error: iErr } = await supabase
+        .from("vehicle_inspections")
+        .select("id, vehicle_id, naslednji_pregled")
+        .not("naslednji_pregled", "is", null)
+        .gte("naslednji_pregled", todayIso2)
+        .lte("naslednji_pregled", cutoffIso2);
+      if (iErr) throw iErr;
+      const candidates = (insp ?? []) as { id: string; vehicle_id: string; naslednji_pregled: string }[];
+      if (candidates.length === 0) {
+        return new Response(JSON.stringify({ ok: true, sent: 0, message: "Ni tehničnih pregledov v oknu" }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const vehicleIds = [...new Set(candidates.map((c) => c.vehicle_id))];
+      const { data: vehData } = await supabase.from("vehicles").select("id, oznaka, registracija").in("id", vehicleIds);
+      const vehMap = new Map((vehData ?? []).map((v: { id: string; oznaka: string; registracija: string | null }) => [v.id, v]));
+
+      const transporter = buildTransporter(settings);
+      const fromName = settings.smtp_from_name || "PGD";
+      const from = `"${fromName}" <${settings.smtp_from}>`;
+      let sent = 0;
+      for (const c of candidates) {
+        const dni = daysBetween(c.naslednji_pregled);
+        const v = vehMap.get(c.vehicle_id);
+        const label = v ? `${v.oznaka}${v.registracija ? ` (${v.registracija})` : ""}` : "Vozilo";
+        const subject = `Opomnik: tehnični pregled poteče čez ${dni} dni — ${label}`;
+        const html = `
+          <h2>Opomnik o tehničnem pregledu</h2>
+          <p><strong>${label}</strong></p>
+          <p>Naslednji tehnični pregled: <strong>${fmtDate(c.naslednji_pregled)}</strong></p>
+          <p>Število dni do preteka: <strong>${dni}</strong></p>
+          <hr>
+          <p style="color:#666;font-size:12px">Avtomatski opomnik aplikacije PGD.</p>
+        `;
+        try {
+          await transporter.sendMail({
+            from,
+            to: recipients.join(", "),
+            subject,
+            text: `Tehnični pregled za ${label} poteče ${fmtDate(c.naslednji_pregled)} (${dni} dni).`,
+            html,
+          });
+          sent++;
+        } catch (e) { console.error("Insp send failed", c.id, e); }
+      }
+      try { transporter.close(); } catch { /* ignore */ }
+      return new Response(JSON.stringify({ ok: true, sent, total: candidates.length }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const recipients = (settings.reminder_recipients ?? []).filter((e) => e && e.includes("@"));
