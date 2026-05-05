@@ -4,7 +4,6 @@ import PageHeader from "@/components/PageHeader";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useVehicles } from "@/hooks/useVehicles";
-import { useMembers } from "@/hooks/useMembers";
 import { useModulePermissions } from "@/hooks/useModulePermissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
