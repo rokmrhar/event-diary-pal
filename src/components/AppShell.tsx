@@ -22,6 +22,7 @@ import {
   Power,
   UserCircle2,
   Clock,
+  Map,
   LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ const sidebarItems: SidebarItem[] = [
   { icon: Archive, label: "ARHIV INTERVENCIJ", to: "/arhiv-intervencij" },
   { icon: ClipboardList, label: "POTNI NALOG", to: "/potni-nalog" },
   { icon: AlertCircle, label: "DOGODEK VEČJEGA OBSEGA", to: "/vecji-obseg" },
+  { icon: Map, label: "SPIN", to: "/spin" },
   { icon: Wrench, label: "SERVISNA KNJIGA", to: "/servisi" },
   { icon: Truck, label: "VOZILA", to: "/vozila" },
   { icon: Stethoscope, label: "ZDRAVNIŠKI PREGLEDI", to: "/zdravniski-pregledi" },
