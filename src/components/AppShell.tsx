@@ -186,7 +186,7 @@ export default function AppShell({ children }: AppShellProps) {
       {/* Main column */}
       <div className="flex-1 flex flex-col min-w-0 lg:ml-64 h-screen overflow-hidden">
         {/* Top bar */}
-        <header className="bg-brand-navy text-brand-navy-foreground border-b border-white/10 z-20 shrink-0">
+       <header className="sticky top-0 bg-brand-navy text-brand-navy-foreground border-b border-white/10 z-20 shrink-0">
           <div className="flex items-center justify-between gap-3 px-3 sm:px-6 py-3">
             <div className="flex items-center gap-2">
               <button
