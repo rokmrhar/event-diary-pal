@@ -80,7 +80,8 @@ export default function MembersTab() {
   };
 
   const toggleLicense = async (id: string, field: "licenca_b" | "licenca_c", value: boolean) => {
-    const { error } = await supabase.from("members").update({ [field]: value }).eq("id", id);
+    const patch = field === "licenca_b" ? { licenca_b: value } : { licenca_c: value };
+    const { error } = await supabase.from("members").update(patch).eq("id", id);
     if (error) return toast({ title: "Napaka", description: error.message, variant: "destructive" });
     refresh();
   };
