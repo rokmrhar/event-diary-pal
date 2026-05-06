@@ -13,6 +13,8 @@ export const MODULES = [
   { key: "cylinder_fillings", label: "Polnjenja posod" },
   { key: "pranja", label: "Pranja" },
   { key: "potni_nalog", label: "Potni nalog" },
+  { key: "medical_view", label: "Zdravniški pregledi — ogled" },
+  { key: "medical_edit", label: "Zdravniški pregledi — urejanje" },
 ] as const;
 
 export type ModuleKey = (typeof MODULES)[number]["key"];

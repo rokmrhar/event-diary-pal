@@ -133,6 +133,102 @@ export type Database = {
         }
         Relationships: []
       }
+      email_log: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          recipient: string
+          related_id: string | null
+          status: string
+          subject: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          recipient: string
+          related_id?: string | null
+          status: string
+          subject?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          recipient?: string
+          related_id?: string | null
+          status?: string
+          subject?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
+      email_schedules: {
+        Row: {
+          created_at: string
+          days_before: number
+          enabled: boolean
+          hour: number
+          id: string
+          interval_days: number
+          label: string
+          last_run_at: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          days_before?: number
+          enabled?: boolean
+          hour?: number
+          id?: string
+          interval_days?: number
+          label: string
+          last_run_at?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          days_before?: number
+          enabled?: boolean
+          hour?: number
+          id?: string
+          interval_days?: number
+          label?: string
+          last_run_at?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          body_html: string
+          id: string
+          key: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          body_html: string
+          id?: string
+          key: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          body_html?: string
+          id?: string
+          key?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ida_hrbtisca: {
         Row: {
           created_at: string
@@ -643,6 +739,48 @@ export type Database = {
         }
         Relationships: []
       }
+      medical_plans: {
+        Row: {
+          created_at: string
+          id: string
+          location: string | null
+          medical_check_id: string | null
+          member_email: string | null
+          member_name: string
+          opombe: string | null
+          planned_date: string
+          reminder_sent_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          medical_check_id?: string | null
+          member_email?: string | null
+          member_name: string
+          opombe?: string | null
+          planned_date: string
+          reminder_sent_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          medical_check_id?: string | null
+          member_email?: string | null
+          member_name?: string
+          opombe?: string | null
+          planned_date?: string
+          reminder_sent_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       medical_reminder_log: {
         Row: {
           id: string
@@ -678,6 +816,7 @@ export type Database = {
       members: {
         Row: {
           created_at: string
+          email: string | null
           id: string
           licenca_b: boolean
           licenca_c: boolean
@@ -686,6 +825,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email?: string | null
           id?: string
           licenca_b?: boolean
           licenca_c?: boolean
@@ -694,6 +834,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email?: string | null
           id?: string
           licenca_b?: boolean
           licenca_c?: boolean
