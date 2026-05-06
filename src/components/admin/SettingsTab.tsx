@@ -84,7 +84,7 @@ export default function SettingsTab() {
 
   const runNow = async () => {
     setTesting(true);
-    const { data, error } = await supabase.functions.invoke("send-medical-reminders", { body: {} });
+    const { data, error } = await supabase.functions.invoke("send-medical-reminders", { body: { mode: "zdravniski" } });
     setTesting(false);
     if (error) return toast({ title: "Napaka", description: error.message, variant: "destructive" });
     const r = data as { ok: boolean; sent?: number; message?: string; error?: string };
@@ -97,7 +97,7 @@ export default function SettingsTab() {
 
   const runInspectionsNow = async () => {
     setTestingInsp(true);
-    const { data, error } = await supabase.functions.invoke("send-medical-reminders", { body: { mode: "inspections" } });
+    const { data, error } = await supabase.functions.invoke("send-medical-reminders", { body: { mode: "tehnicni" } });
     setTestingInsp(false);
     if (error) return toast({ title: "Napaka", description: error.message, variant: "destructive" });
     const r = data as { ok: boolean; sent?: number; message?: string; error?: string };
