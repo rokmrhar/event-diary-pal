@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Lock, Pencil, Plus, Stethoscope, Trash2 } from "lucide-react";
+import { Lock, Pencil, Plus, Stethoscope, Trash2, CalendarPlus } from "lucide-react";
 import AppShell from "@/components/AppShell";
 import PageHeader from "@/components/PageHeader";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,6 +36,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMembers } from "@/hooks/useMembers";
 import { formatDateSI } from "@/lib/format";
+import { useModulePermissions } from "@/hooks/useModulePermissions";
+import MedicalPlansTab from "@/components/medical/MedicalPlansTab";
 
 type Row = {
   id: string;
@@ -64,7 +67,22 @@ function statusBadge(days: number | null) {
 export default function ZdravniskiPregledi() {
   const { user, isAdmin } = useAuth();
   const { members } = useMembers();
-  const allowed = isAdmin;
+  const { canEdit } = useModulePermissions();
+  const canView = isAdmin || canEdit("medical_view") || canEdit("medical_edit");
+  const allowed = isAdmin || canEdit("medical_edit");
+
+  if (!canView) {
+    return (
+      <AppShell>
+        <div className="p-6 max-w-3xl mx-auto">
+          <PageHeader title="Zdravniški pregledi" icon={Stethoscope} />
+          <div className="mt-6 p-6 border border-border rounded-xl bg-muted/40 text-sm text-muted-foreground flex items-center gap-2">
+            <Lock className="h-4 w-4" /> Za ogled tega modula nimate pravic.
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
 
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -154,14 +172,22 @@ export default function ZdravniskiPregledi() {
         <PageHeader
           title="Zdravniški pregledi"
           icon={Stethoscope}
-          actions={
-            allowed && (
-              <Button onClick={openCreate} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
-                <Plus className="h-4 w-4 mr-1" /> Dodaj zapis
-              </Button>
-            )
-          }
         />
+
+        <Tabs defaultValue="evidenca" className="w-full">
+          <TabsList>
+            <TabsTrigger value="evidenca"><Stethoscope className="h-3.5 w-3.5 mr-1" /> Zdravniški pregledi</TabsTrigger>
+            <TabsTrigger value="nacrt"><CalendarPlus className="h-3.5 w-3.5 mr-1" /> Načrtovanje</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="evidenca" className="mt-4 space-y-4">
+            {allowed && (
+              <div className="flex justify-end">
+                <Button onClick={openCreate} className="bg-brand-red hover:bg-brand-red/90 text-brand-red-foreground">
+                  <Plus className="h-4 w-4 mr-1" /> Dodaj zapis
+                </Button>
+              </div>
+            )}
 
         {!allowed && (
           <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/40 text-sm text-muted-foreground">
@@ -218,6 +244,12 @@ export default function ZdravniskiPregledi() {
             </TableBody>
           </Table>
         </div>
+          </TabsContent>
+
+          <TabsContent value="nacrt" className="mt-4">
+            <MedicalPlansTab rows={rows} canEdit={allowed} />
+          </TabsContent>
+        </Tabs>
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
