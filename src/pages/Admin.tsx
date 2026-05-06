@@ -10,6 +10,9 @@ import MembersTab from "@/components/admin/MembersTab";
 import ActivitiesTab from "@/components/admin/ActivitiesTab";
 import UsersTab from "@/components/admin/UsersTab";
 import SettingsTab from "@/components/admin/SettingsTab";
+import EmailSchedulesTab from "@/components/admin/EmailSchedulesTab";
+import EmailTemplatesTab from "@/components/admin/EmailTemplatesTab";
+import EmailLogTab from "@/components/admin/EmailLogTab";
 
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -51,12 +54,15 @@ export default function Admin() {
 
       <div className="max-w-7xl mx-auto p-3 sm:p-6 lg:p-8 space-y-4">
         <Tabs defaultValue="stats" className="w-full">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-5 w-full h-auto gap-1">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 w-full h-auto gap-1">
             <TabsTrigger value="stats" className="text-xs sm:text-sm">Statistika</TabsTrigger>
             <TabsTrigger value="activities" className="text-xs sm:text-sm">Aktivnosti</TabsTrigger>
             <TabsTrigger value="members" className="text-xs sm:text-sm">Člani</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm">Uporabniki</TabsTrigger>
             <TabsTrigger value="settings" className="text-xs sm:text-sm">Nastavitve</TabsTrigger>
+            <TabsTrigger value="schedules" className="text-xs sm:text-sm">Urniki</TabsTrigger>
+            <TabsTrigger value="templates" className="text-xs sm:text-sm">Predloge</TabsTrigger>
+            <TabsTrigger value="emaillog" className="text-xs sm:text-sm">Dnevnik</TabsTrigger>
           </TabsList>
 
           <div className="bg-card border border-border rounded-2xl shadow-sm p-3 sm:p-5 lg:p-6 mt-4">
@@ -74,6 +80,15 @@ export default function Admin() {
             </TabsContent>
             <TabsContent value="settings" className="mt-0">
               <SettingsTab />
+            </TabsContent>
+            <TabsContent value="schedules" className="mt-0">
+              <EmailSchedulesTab />
+            </TabsContent>
+            <TabsContent value="templates" className="mt-0">
+              <EmailTemplatesTab />
+            </TabsContent>
+            <TabsContent value="emaillog" className="mt-0">
+              <EmailLogTab />
             </TabsContent>
           </div>
         </Tabs>
