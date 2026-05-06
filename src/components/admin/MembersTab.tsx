@@ -14,6 +14,7 @@ export default function MembersTab() {
   const [adding, setAdding] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
   const [search, setSearch] = useState("");
 
   const visible = members.filter((m) =>
@@ -54,18 +55,21 @@ export default function MembersTab() {
   const startEdit = (id: string, name: string) => {
     setEditId(id);
     setEditName(name);
+    const m = members.find((x) => x.id === id);
+    setEditEmail(m?.email ?? "");
   };
 
   const cancelEdit = () => {
     setEditId(null);
     setEditName("");
+    setEditEmail("");
   };
 
   const saveEdit = async () => {
     if (!editId) return;
     const name = editName.trim();
     if (!name) return;
-    const { error } = await supabase.from("members").update({ name }).eq("id", editId);
+    const { error } = await supabase.from("members").update({ name, email: editEmail.trim() || null }).eq("id", editId);
     if (error) {
       toast({
         title: "Napaka",
@@ -113,6 +117,7 @@ export default function MembersTab() {
           <TableHeader>
             <TableRow>
               <TableHead>Ime in priimek</TableHead>
+              <TableHead>E-pošta</TableHead>
               <TableHead className="text-center w-20">B izpit</TableHead>
               <TableHead className="text-center w-20">C izpit</TableHead>
               <TableHead className="w-[160px] text-right">Dejanja</TableHead>
@@ -121,7 +126,7 @@ export default function MembersTab() {
           <TableBody>
             {visible.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                   Ni članov
                 </TableCell>
               </TableRow>
@@ -137,6 +142,18 @@ export default function MembersTab() {
                       />
                     ) : (
                       <span className="font-medium">{m.name}</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editId === m.id ? (
+                      <Input
+                        type="email"
+                        value={editEmail}
+                        onChange={(e) => setEditEmail(e.target.value)}
+                        placeholder="ime@example.com"
+                      />
+                    ) : (
+                      <span className="text-sm text-muted-foreground">{m.email ?? "—"}</span>
                     )}
                   </TableCell>
                   <TableCell className="text-center">
