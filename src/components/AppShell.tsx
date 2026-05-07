@@ -1,54 +1,30 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import * as Icons from "lucide-react";
 import {
   Menu,
   Home,
-  AlertCircle,
-  ClipboardList,
-  Archive,
-  Truck,
-  Wrench,
-  PencilLine,
-  Stethoscope,
-  Flame,
-  ShieldCheck,
-  BarChart3,
-  Biohazard,
-  Bell,
-  MessageSquare,
-  Moon,
   Settings,
   Info,
   Power,
   UserCircle2,
   Clock,
-  Map,
-  LucideIcon,
+  Circle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavItems } from "@/hooks/useNavItems";
+import { useModulePermissions } from "@/hooks/useModulePermissions";
 
 interface AppShellProps {
   children: ReactNode;
 }
 
-type SidebarItem = { icon: LucideIcon; label: string; to?: string };
-
-const sidebarItems: SidebarItem[] = [
-  { icon: ClipboardList, label: "POROČILO O INTERVENCIJI", to: "/intervencija" },
-  { icon: PencilLine, label: "VNOS AKTIVNOSTI", to: "/aktivnost" },
-  { icon: Archive, label: "ARHIV INTERVENCIJ", to: "/arhiv-intervencij" },
-  { icon: ClipboardList, label: "POTNI NALOG", to: "/potni-nalog" },
-  { icon: AlertCircle, label: "DOGODEK VEČJEGA OBSEGA", to: "/vecji-obseg" },
-  { icon: Map, label: "SPIN", to: "/spin" },
-  { icon: Wrench, label: "SERVISNA KNJIGA", to: "/servisi" },
-  { icon: Truck, label: "VOZILA", to: "/vozila" },
-  { icon: Stethoscope, label: "ZDRAVNIŠKI PREGLEDI", to: "/zdravniski-pregledi" },
-  { icon: ShieldCheck, label: "EVIDENCA IDA", to: "/ida" },
-  { icon: Biohazard, label: "EVIDENCA PRANJ", to: "/pranja" },
-  { icon: BarChart3, label: "STATISTIKA", to: "/statistika" },
-  { icon: Flame, label: "POŽARNE STRAŽE" },
-];
+function getIcon(name: string | null) {
+  if (!name) return Circle;
+  const lib = Icons as unknown as Record<string, Icons.LucideIcon>;
+  return lib[name] ?? Circle;
+}
 
 export default function AppShell({ children }: AppShellProps) {
   const { user, isAdmin, signOut } = useAuth();
