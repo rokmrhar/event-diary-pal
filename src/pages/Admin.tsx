@@ -7,12 +7,12 @@ import { ArrowLeft, LogOut } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import StatsTab from "@/components/admin/StatsTab";
 import MembersTab from "@/components/admin/MembersTab";
-import ActivitiesTab from "@/components/admin/ActivitiesTab";
 import UsersTab from "@/components/admin/UsersTab";
 import SettingsTab from "@/components/admin/SettingsTab";
 import EmailSchedulesTab from "@/components/admin/EmailSchedulesTab";
 import EmailTemplatesTab from "@/components/admin/EmailTemplatesTab";
 import EmailLogTab from "@/components/admin/EmailLogTab";
+import NavItemsTab from "@/components/admin/NavItemsTab";
 
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -56,9 +56,9 @@ export default function Admin() {
         <Tabs defaultValue="stats" className="w-full">
           <TabsList className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 w-full h-auto gap-1">
             <TabsTrigger value="stats" className="text-xs sm:text-sm">Statistika</TabsTrigger>
-            <TabsTrigger value="activities" className="text-xs sm:text-sm">Aktivnosti</TabsTrigger>
             <TabsTrigger value="members" className="text-xs sm:text-sm">Člani</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm">Uporabniki</TabsTrigger>
+            <TabsTrigger value="menu" className="text-xs sm:text-sm">Meni</TabsTrigger>
             <TabsTrigger value="settings" className="text-xs sm:text-sm">Nastavitve</TabsTrigger>
             <TabsTrigger value="schedules" className="text-xs sm:text-sm">Urniki</TabsTrigger>
             <TabsTrigger value="templates" className="text-xs sm:text-sm">Predloge</TabsTrigger>
@@ -69,14 +69,14 @@ export default function Admin() {
             <TabsContent value="stats" className="mt-0">
               <StatsTab />
             </TabsContent>
-            <TabsContent value="activities" className="mt-0">
-              <ActivitiesTab />
-            </TabsContent>
             <TabsContent value="members" className="mt-0">
               <MembersTab />
             </TabsContent>
             <TabsContent value="users" className="mt-0">
               <UsersTab />
+            </TabsContent>
+            <TabsContent value="menu" className="mt-0">
+              <NavItemsTab />
             </TabsContent>
             <TabsContent value="settings" className="mt-0">
               <SettingsTab />
