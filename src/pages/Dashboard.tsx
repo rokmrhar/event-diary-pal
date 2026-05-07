@@ -67,6 +67,21 @@ export default function Dashboard() {
   const [interventions, setInterventions] = useState<InterventionRow[]>([]);
   const [majorEvents, setMajorEvents] = useState<MajorEventRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [displayName, setDisplayName] = useState<string>("");
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("display_name, email")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      const dn = (data?.display_name && data.display_name.trim()) ||
+        (data?.email ?? user.email ?? "").split("@")[0] || "";
+      setDisplayName(dn);
+    })();
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -144,7 +159,7 @@ export default function Dashboard() {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight uppercase">Pregled</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Dobrodošel{user?.email ? `, ${user.email.split("@")[0]}` : ""}.
+              Dobrodošli{displayName ? `, ${displayName}` : ""}.
             </p>
           </div>
         </div>
