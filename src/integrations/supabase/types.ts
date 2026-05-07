@@ -843,6 +843,48 @@ export type Database = {
         }
         Relationships: []
       }
+      nav_items: {
+        Row: {
+          created_at: string
+          external: boolean
+          icon: string | null
+          id: string
+          kind: string
+          label: string
+          module_key: string | null
+          sort_order: number
+          updated_at: string
+          url: string | null
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          external?: boolean
+          icon?: string | null
+          id?: string
+          kind?: string
+          label: string
+          module_key?: string | null
+          sort_order?: number
+          updated_at?: string
+          url?: string | null
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          external?: boolean
+          icon?: string | null
+          id?: string
+          kind?: string
+          label?: string
+          module_key?: string | null
+          sort_order?: number
+          updated_at?: string
+          url?: string | null
+          visible?: boolean
+        }
+        Relationships: []
+      }
       pranja: {
         Row: {
           created_at: string
@@ -954,18 +996,21 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          level: string
           module: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          level?: string
           module: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          level?: string
           module?: string
           user_id?: string
         }
@@ -1160,6 +1205,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_module_access: {
+        Args: { _level: string; _module: string; _user_id: string }
+        Returns: boolean
+      }
       has_module_permission: {
         Args: { _module: string; _user_id: string }
         Returns: boolean
