@@ -1,5 +1,5 @@
 import AppShell from "@/components/AppShell";
-import { PageHeader } from "@/components/PageHeader";
+import PageHeader from "@/components/PageHeader";
 import ActivitiesTab from "@/components/admin/ActivitiesTab";
 import { Archive } from "lucide-react";
 import { useEffect } from "react";
