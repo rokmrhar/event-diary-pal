@@ -18,29 +18,34 @@ export const MODULES = [
 ] as const;
 
 export type ModuleKey = (typeof MODULES)[number]["key"];
+export type PermLevel = "view" | "edit";
 
 /**
- * Returns the set of module keys the current user can edit.
- * Admins always have all permissions.
+ * Returns module access map { module -> 'view' | 'edit' }.
+ * Admins implicitly get 'edit' for every module.
  */
 export function useModulePermissions() {
   const { user, isAdmin } = useAuth();
-  const [permissions, setPermissions] = useState<Set<string>>(new Set());
+  const [levels, setLevels] = useState<Record<string, PermLevel>>({});
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     if (!user) {
-      setPermissions(new Set());
+      setLevels({});
       setLoading(false);
       return;
     }
     setLoading(true);
     const { data, error } = await supabase
       .from("user_module_permissions")
-      .select("module")
+      .select("module, level")
       .eq("user_id", user.id);
     if (!error && data) {
-      setPermissions(new Set(data.map((d: { module: string }) => d.module)));
+      const map: Record<string, PermLevel> = {};
+      for (const r of data as { module: string; level: PermLevel }[]) {
+        map[r.module] = r.level ?? "edit";
+      }
+      setLevels(map);
     }
     setLoading(false);
   }, [user]);
@@ -49,10 +54,19 @@ export function useModulePermissions() {
     refresh();
   }, [refresh]);
 
+  const canView = useCallback(
+    (module: string) => isAdmin || !!levels[module],
+    [isAdmin, levels]
+  );
   const canEdit = useCallback(
-    (module: ModuleKey) => isAdmin || permissions.has(module),
-    [isAdmin, permissions]
+    (module: string) => isAdmin || levels[module] === "edit",
+    [isAdmin, levels]
   );
 
-  return { permissions, canEdit, loading, refresh };
+  // Backward-compat: existing `permissions` Set semantically meant "can edit".
+  const permissions = new Set(
+    Object.entries(levels).filter(([, v]) => v === "edit").map(([k]) => k)
+  );
+
+  return { permissions, levels, canView, canEdit, loading, refresh };
 }
