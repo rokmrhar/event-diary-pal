@@ -29,6 +29,7 @@ import ArhivPranj from "./pages/pranja/ArhivPranj.tsx";
 import ZdravniskiPregledi from "./pages/ZdravniskiPregledi.tsx";
 import PotniNalog from "./pages/PotniNalog.tsx";
 import Spin from "./pages/Spin.tsx";
+import ArhivAktivnosti from "./pages/ArhivAktivnosti.tsx";
 import { AuthProvider } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/zdravniski-pregledi" element={<ZdravniskiPregledi />} />
             <Route path="/potni-nalog" element={<PotniNalog />} />
             <Route path="/spin" element={<Spin />} />
+            <Route path="/arhiv-aktivnosti" element={<ArhivAktivnosti />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
