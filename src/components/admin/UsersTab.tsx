@@ -17,11 +17,18 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil, UserPlus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { MODULES, type ModuleKey } from "@/hooks/useModulePermissions";
+import { MODULES, type ModuleKey, type PermLevel } from "@/hooks/useModulePermissions";
+import {
+  Select as USelect,
+  SelectContent as USelectContent,
+  SelectItem as USelectItem,
+  SelectTrigger as USelectTrigger,
+  SelectValue as USelectValue,
+} from "@/components/ui/select";
 
 type Profile = { user_id: string; email: string | null; display_name: string | null };
 type RoleRow = { user_id: string; role: "admin" | "user" };
-type PermRow = { user_id: string; module: string };
+type PermRow = { user_id: string; module: string; level: PermLevel };
 
 export default function UsersTab() {
   const { user: currentUser } = useAuth();
@@ -49,7 +56,7 @@ export default function UsersTab() {
     const [p, r, mp] = await Promise.all([
       supabase.from("profiles").select("user_id, email, display_name"),
       supabase.from("user_roles").select("user_id, role"),
-      supabase.from("user_module_permissions").select("user_id, module"),
+      supabase.from("user_module_permissions").select("user_id, module, level"),
     ]);
     if (p.error || r.error || mp.error) {
       toast({
@@ -70,21 +77,18 @@ export default function UsersTab() {
   }, []);
 
   const isAdminUser = (uid: string) => roles.some((r) => r.user_id === uid && r.role === "admin");
-  const hasPerm = (uid: string, module: ModuleKey) =>
-    perms.some((p) => p.user_id === uid && p.module === module);
+  const getPermLevel = (uid: string, module: ModuleKey): "none" | PermLevel => {
+    const r = perms.find((p) => p.user_id === uid && p.module === module);
+    return r ? (r.level ?? "edit") : "none";
+  };
 
-  const togglePerm = async (uid: string, module: ModuleKey, enable: boolean) => {
+  const setPermLevel = async (
+    uid: string,
+    module: ModuleKey,
+    level: "none" | PermLevel
+  ) => {
     setPermPending(`${uid}-${module}`);
-    if (enable) {
-      const { error } = await supabase
-        .from("user_module_permissions")
-        .insert({ user_id: uid, module });
-      if (error && error.code !== "23505") {
-        setPermPending(null);
-        toast({ title: "Napaka", description: error.message, variant: "destructive" });
-        return;
-      }
-    } else {
+    if (level === "none") {
       const { error } = await supabase
         .from("user_module_permissions")
         .delete()
@@ -95,9 +99,31 @@ export default function UsersTab() {
         toast({ title: "Napaka", description: error.message, variant: "destructive" });
         return;
       }
+    } else {
+      // Try update, then insert if missing
+      const { data: upd, error: updErr } = await supabase
+        .from("user_module_permissions")
+        .update({ level })
+        .eq("user_id", uid)
+        .eq("module", module)
+        .select("id");
+      if (updErr) {
+        setPermPending(null);
+        toast({ title: "Napaka", description: updErr.message, variant: "destructive" });
+        return;
+      }
+      if (!upd || upd.length === 0) {
+        const { error: insErr } = await supabase
+          .from("user_module_permissions")
+          .insert({ user_id: uid, module, level });
+        if (insErr && insErr.code !== "23505") {
+          setPermPending(null);
+          toast({ title: "Napaka", description: insErr.message, variant: "destructive" });
+          return;
+        }
+      }
     }
     setPermPending(null);
-    toast({ title: enable ? "Pravica dodana" : "Pravica odvzeta" });
     load();
   };
 
@@ -324,19 +350,38 @@ export default function UsersTab() {
               </div>
 
               <div className="border-t border-border pt-4 space-y-3">
-                <Label className="text-base font-semibold">Pravice urejanja po modulih</Label>
+                <Label className="text-base font-semibold">Pravice po modulih</Label>
+                <p className="text-xs text-muted-foreground">
+                  Brez = uporabnik modula sploh ne vidi. Ogled = lahko vidi podatke. Urejanje = lahko dodaja in spreminja.
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {MODULES.map((m) => {
                     const admin = isAdminUser(editing.user_id);
-                    const enabled = admin || hasPerm(editing.user_id, m.key);
+                    const lvl: "none" | PermLevel = admin
+                      ? "edit"
+                      : getPermLevel(editing.user_id, m.key);
                     return (
-                      <div key={m.key} className="flex items-center justify-between border border-border rounded-lg px-3 py-2">
-                        <Label className="text-sm">{m.label}</Label>
-                        <Switch
-                          checked={enabled}
+                      <div
+                        key={m.key}
+                        className="flex items-center justify-between gap-2 border border-border rounded-lg px-3 py-2"
+                      >
+                        <Label className="text-sm flex-1">{m.label}</Label>
+                        <USelect
+                          value={lvl}
                           disabled={admin || permPending === `${editing.user_id}-${m.key}`}
-                          onCheckedChange={(c) => togglePerm(editing.user_id, m.key, c)}
-                        />
+                          onValueChange={(v) =>
+                            setPermLevel(editing.user_id, m.key, v as "none" | PermLevel)
+                          }
+                        >
+                          <USelectTrigger className="w-[130px] h-8">
+                            <USelectValue />
+                          </USelectTrigger>
+                          <USelectContent>
+                            <USelectItem value="none">Brez</USelectItem>
+                            <USelectItem value="view">Ogled</USelectItem>
+                            <USelectItem value="edit">Urejanje</USelectItem>
+                          </USelectContent>
+                        </USelect>
                       </div>
                     );
                   })}
