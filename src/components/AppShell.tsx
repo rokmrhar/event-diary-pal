@@ -30,6 +30,8 @@ export default function AppShell({ children }: AppShellProps) {
   const { user, isAdmin, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [now, setNow] = useState(() => new Date());
+  const { items: navItems } = useNavItems();
+  const { canView, loading: permsLoading } = useModulePermissions();
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
@@ -44,6 +46,13 @@ export default function AppShell({ children }: AppShellProps) {
   const mi = String(now.getMinutes()).padStart(2, "0");
   const ss = String(now.getSeconds()).padStart(2, "0");
   const timeStr = `${hh}:${mi}:${ss}`;
+
+  const visibleItems = navItems.filter((it) => {
+    if (!it.visible) return false;
+    if (it.kind === "separator") return true;
+    if (it.module_key && !permsLoading && !canView(it.module_key)) return false;
+    return true;
+  });
 
   return (
     <div className="h-screen flex bg-background overflow-hidden">
@@ -90,57 +99,59 @@ export default function AppShell({ children }: AppShellProps) {
           <h2 className="text-sm font-bold tracking-wide text-center"> PGD ŠEMPETER PRI GORICI </h2>
         </div>
 
-        {/* Section label */}
-        <div className="px-4 py-2 flex items-center gap-2 text-xs uppercase text-white/50">
-          <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-          Operativa
-        </div>
-
-        {/* Nav items */}
+        {/* Nav items (loaded from DB, editable in admin) */}
         <nav className="flex-1 overflow-y-auto px-2 py-1 space-y-0.5 text-[11px] font-semibold">
-          {sidebarItems.slice(0, -1).map((item) => {
+          {visibleItems.map((item) => {
+            if (item.kind === "separator") {
+              return (
+                <div
+                  key={item.id}
+                  className="px-2 py-2 mt-1 flex items-center gap-2 text-xs uppercase text-white/50"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
+                  {item.label}
+                </div>
+              );
+            }
+            const Icon = getIcon(item.icon);
+            const cls =
+              "w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-white/10 text-left tracking-wide";
             const inner = (
               <>
-                <item.icon className="h-4 w-4 text-brand-red shrink-0" />
+                <Icon className="h-4 w-4 text-brand-red shrink-0" />
                 <span className="truncate">{item.label}</span>
               </>
             );
-            const cls =
-              "w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-white/10 text-left tracking-wide";
-            return item.to ? (
-              <Link key={item.label} to={item.to} className={cls} onClick={() => setSidebarOpen(false)}>
+            if (!item.url) {
+              return (
+                <button key={item.id} className={cls}>
+                  {inner}
+                </button>
+              );
+            }
+            if (item.external) {
+              return (
+                <a
+                  key={item.id}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cls}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  {inner}
+                </a>
+              );
+            }
+            return (
+              <Link
+                key={item.id}
+                to={item.url}
+                className={cls}
+                onClick={() => setSidebarOpen(false)}
+              >
                 {inner}
               </Link>
-            ) : (
-              <button key={item.label} className={cls}>
-                {inner}
-              </button>
-            );
-          })}
-        
-          {/* Section label — before last 1 items */}
-          <div className="px-4 py-2 flex items-center gap-2 text-xs uppercase text-white/50">
-          <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-            V IZDELAVI
-          </div>
-        
-          {sidebarItems.slice(-1).map((item) => {
-            const inner = (
-              <>
-                <item.icon className="h-4 w-4 text-brand-red shrink-0" />
-                <span className="truncate">{item.label}</span>
-              </>
-            );
-            const cls =
-              "w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-white/10 text-left tracking-wide";
-            return item.to ? (
-              <Link key={item.label} to={item.to} className={cls} onClick={() => setSidebarOpen(false)}>
-                {inner}
-              </Link>
-            ) : (
-              <button key={item.label} className={cls}>
-                {inner}
-              </button>
             );
           })}
         </nav>
