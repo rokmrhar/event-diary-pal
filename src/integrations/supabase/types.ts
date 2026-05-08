@@ -133,6 +133,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_pages: {
+        Row: {
+          content: string
+          content_type: string
+          created_at: string
+          id: string
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+          visible: boolean
+        }
+        Insert: {
+          content?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Update: {
+          content?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          visible?: boolean
+        }
+        Relationships: []
+      }
       email_log: {
         Row: {
           created_at: string
