@@ -30,7 +30,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import AppShell from "@/components/AppShell";
 import { useModulePermissions } from "@/hooks/useModulePermissions";
-import { Lock, Pencil, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Lock, Pencil, Plus, Trash2, ArrowLeft, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatMonthSI } from "@/lib/format";
 
@@ -87,6 +87,15 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey, extra
   const [editing, setEditing] = useState<Row | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc" | null>(null);
+
+  const toggleSort = (key: string) => {
+    if (sortKey !== key) { setSortKey(key); setSortDir("asc"); return; }
+    if (sortDir === "asc") { setSortDir("desc"); return; }
+    if (sortDir === "desc") { setSortKey(null); setSortDir(null); return; }
+    setSortDir("asc");
+  };
 
   const load = async () => {
     setLoading(true);
@@ -109,11 +118,31 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey, extra
 
   const visible = useMemo(() => {
     const q = search.toLowerCase().trim();
-    if (!q) return rows;
-    return rows.filter((r) =>
-      fields.some((f) => String(r[f.key] ?? "").toLowerCase().includes(q))
-    );
-  }, [rows, search, fields]);
+    let out = rows;
+    if (q) {
+      out = out.filter((r) =>
+        fields.some((f) => String(r[f.key] ?? "").toLowerCase().includes(q))
+      );
+    }
+    if (sortKey && sortDir) {
+      const f = fields.find((x) => x.key === sortKey);
+      const isNum = f?.type === "number" || f?.type === "year";
+      out = [...out].sort((a, b) => {
+        const av = a[sortKey];
+        const bv = b[sortKey];
+        const aEmpty = av === null || av === undefined || av === "";
+        const bEmpty = bv === null || bv === undefined || bv === "";
+        if (aEmpty && bEmpty) return 0;
+        if (aEmpty) return 1;
+        if (bEmpty) return -1;
+        let cmp = 0;
+        if (isNum) cmp = Number(av) - Number(bv);
+        else cmp = String(av).localeCompare(String(bv), "sl", { sensitivity: "base", numeric: true });
+        return sortDir === "asc" ? cmp : -cmp;
+      });
+    }
+    return out;
+  }, [rows, search, fields, sortKey, sortDir]);
 
   const openCreate = () => {
     setEditing(null);
@@ -315,7 +344,16 @@ export default function IdaEvidencaApp({ title, table, fields, primaryKey, extra
               <TableRow>
                 {fields.map((f) => (
                   <TableHead key={f.key} className={f.key === primaryKey ? "font-semibold" : undefined}>
-                    {f.label}
+                    <button
+                      type="button"
+                      onClick={() => toggleSort(f.key)}
+                      className="inline-flex items-center gap-1 hover:text-foreground"
+                    >
+                      {f.label}
+                      {sortKey === f.key && sortDir === "asc" ? <ArrowUp className="h-3 w-3" /> :
+                        sortKey === f.key && sortDir === "desc" ? <ArrowDown className="h-3 w-3" /> :
+                        <ArrowUpDown className="h-3 w-3 opacity-40" />}
+                    </button>
                   </TableHead>
                 ))}
                 {extraColumn && <TableHead className="text-center">{extraColumn.label}</TableHead>}
