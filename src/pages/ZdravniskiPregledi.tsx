@@ -67,9 +67,47 @@ function statusBadge(days: number | null) {
 export default function ZdravniskiPregledi() {
   const { user, isAdmin } = useAuth();
   const { members } = useMembers();
-  const { canView: cv, canEdit } = useModulePermissions();
+  const { canView: cv, canEdit, loading: permsLoading } = useModulePermissions();
   const canView = isAdmin || cv("medical");
   const allowed = isAdmin || canEdit("medical");
+
+  const [rows, setRows] = useState<Row[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Row | null>(null);
+  const [form, setForm] = useState({ member_name: "", zadnji_pregled: "", naslednji_pregled: "", opombe: "" });
+  const [saving, setSaving] = useState(false);
+
+  const load = async () => {
+    if (!canView) { setLoading(false); return; }
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("medical_checks")
+      .select("id, user_id, member_name, zadnji_pregled, naslednji_pregled, opombe")
+      .order("naslednji_pregled", { ascending: true, nullsFirst: false });
+    if (error) toast({ title: "Napaka", description: error.message, variant: "destructive" });
+    setRows((data as Row[]) ?? []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!permsLoading && canView) load();
+  }, [permsLoading, canView]);
+
+  const visible = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return rows;
+    return rows.filter((r) => r.member_name.toLowerCase().includes(q));
+  }, [rows, search]);
+
+  if (permsLoading) {
+    return (
+      <AppShell>
+        <div className="p-6 text-sm text-muted-foreground">Nalagam…</div>
+      </AppShell>
+    );
+  }
 
   if (!canView) {
     return (
@@ -83,35 +121,6 @@ export default function ZdravniskiPregledi() {
       </AppShell>
     );
   }
-
-  const [rows, setRows] = useState<Row[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Row | null>(null);
-  const [form, setForm] = useState({ member_name: "", zadnji_pregled: "", naslednji_pregled: "", opombe: "" });
-  const [saving, setSaving] = useState(false);
-
-  const load = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("medical_checks")
-      .select("id, user_id, member_name, zadnji_pregled, naslednji_pregled, opombe")
-      .order("naslednji_pregled", { ascending: true, nullsFirst: false });
-    if (error) toast({ title: "Napaka", description: error.message, variant: "destructive" });
-    setRows((data as Row[]) ?? []);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const visible = useMemo(() => {
-    const q = search.toLowerCase().trim();
-    if (!q) return rows;
-    return rows.filter((r) => r.member_name.toLowerCase().includes(q));
-  }, [rows, search]);
 
   const openCreate = () => {
     setEditing(null);

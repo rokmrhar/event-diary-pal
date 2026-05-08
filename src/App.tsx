@@ -31,6 +31,7 @@ const ZdravniskiPregledi = lazy(() => import("./pages/ZdravniskiPregledi.tsx"));
 const PotniNalog = lazy(() => import("./pages/PotniNalog.tsx"));
 const Spin = lazy(() => import("./pages/Spin.tsx"));
 const ArhivAktivnosti = lazy(() => import("./pages/ArhivAktivnosti.tsx"));
+const CmsPage = lazy(() => import("./pages/CmsPage.tsx"));
 import { AuthProvider } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient({
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/potni-nalog" element={<PotniNalog />} />
             <Route path="/spin" element={<Spin />} />
             <Route path="/arhiv-aktivnosti" element={<ArhivAktivnosti />} />
+            <Route path="/p/:slug" element={<CmsPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

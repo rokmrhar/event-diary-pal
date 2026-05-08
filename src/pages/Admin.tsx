@@ -13,6 +13,7 @@ import EmailSchedulesTab from "@/components/admin/EmailSchedulesTab";
 import EmailTemplatesTab from "@/components/admin/EmailTemplatesTab";
 import EmailLogTab from "@/components/admin/EmailLogTab";
 import NavItemsTab from "@/components/admin/NavItemsTab";
+import CmsPagesTab from "@/components/admin/CmsPagesTab";
 
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -54,11 +55,12 @@ export default function Admin() {
 
       <div className="max-w-7xl mx-auto p-3 sm:p-6 lg:p-8 space-y-4">
         <Tabs defaultValue="stats" className="w-full">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 w-full h-auto gap-1">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 w-full h-auto gap-1">
             <TabsTrigger value="stats" className="text-xs sm:text-sm">Statistika</TabsTrigger>
             <TabsTrigger value="members" className="text-xs sm:text-sm">Člani</TabsTrigger>
             <TabsTrigger value="users" className="text-xs sm:text-sm">Uporabniki</TabsTrigger>
             <TabsTrigger value="menu" className="text-xs sm:text-sm">Meni</TabsTrigger>
+            <TabsTrigger value="cms" className="text-xs sm:text-sm">Strani</TabsTrigger>
             <TabsTrigger value="settings" className="text-xs sm:text-sm">Nastavitve</TabsTrigger>
             <TabsTrigger value="schedules" className="text-xs sm:text-sm">Urniki</TabsTrigger>
             <TabsTrigger value="templates" className="text-xs sm:text-sm">Predloge</TabsTrigger>
@@ -77,6 +79,9 @@ export default function Admin() {
             </TabsContent>
             <TabsContent value="menu" className="mt-0">
               <NavItemsTab />
+            </TabsContent>
+            <TabsContent value="cms" className="mt-0">
+              <CmsPagesTab />
             </TabsContent>
             <TabsContent value="settings" className="mt-0">
               <SettingsTab />
