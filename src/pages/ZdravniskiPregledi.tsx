@@ -67,9 +67,9 @@ function statusBadge(days: number | null) {
 export default function ZdravniskiPregledi() {
   const { user, isAdmin } = useAuth();
   const { members } = useMembers();
-  const { canEdit } = useModulePermissions();
-  const canView = isAdmin || canEdit("medical_view") || canEdit("medical_edit");
-  const allowed = isAdmin || canEdit("medical_edit");
+  const { canView: cv, canEdit } = useModulePermissions();
+  const canView = isAdmin || cv("medical");
+  const allowed = isAdmin || canEdit("medical");
 
   if (!canView) {
     return (
