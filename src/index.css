@@ -47,7 +47,7 @@ All colors MUST be HSL.
     --brand-navy: 217 55% 18%;
     --brand-navy-foreground: 0 0% 98%;
 
-    --sidebar-background: 217 55% 18%;
+    --sidebar-background: #f6f7f9;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 0 78% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
