@@ -17,8 +17,9 @@ import {
   CartesianGrid,
 } from "recharts";
 import { toast } from "@/hooks/use-toast";
-import { BarChart3, Activity, AlertCircle, Users } from "lucide-react";
+import { BarChart3, Activity, AlertCircle, Users, Lock } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import { useModulePermissions } from "@/hooks/useModulePermissions";
 
 type IntRow = { id: string; datum: string; skupina: string; obcina: string; vodja: string };
 type ActRow = { id: string; datum: string; aktivnost: string };
@@ -34,7 +35,9 @@ const monthLabel = (k: string) => {
 };
 
 export default function Statistika() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
+  const { canView } = useModulePermissions();
+  const allowedView = isAdmin || canView("statistics");
   const [interventions, setInterventions] = useState<IntRow[]>([]);
   const [activities, setActivities] = useState<ActRow[]>([]);
   const [intAtt, setIntAtt] = useState<IntAtt[]>([]);
@@ -113,6 +116,11 @@ export default function Statistika() {
     <AppShell>
       <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
         <PageHeader title="Statistika" icon={BarChart3} description="Pregled intervencij, aktivnosti in udeležbe članov." />
+        {!allowedView ? (
+          <div className="p-6 border border-border rounded-xl bg-muted/40 text-sm text-muted-foreground flex items-center gap-2">
+            <Lock className="h-4 w-4" /> Za ogled tega modula nimate pravic.
+          </div>
+        ) : (<>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <SmallStat icon={<AlertCircle className="h-5 w-5" />} label="Intervencije" value={interventions.length} accent="bg-brand-red" />
