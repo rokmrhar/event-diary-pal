@@ -67,9 +67,17 @@ function statusBadge(days: number | null) {
 export default function ZdravniskiPregledi() {
   const { user, isAdmin } = useAuth();
   const { members } = useMembers();
-  const { canView: cv, canEdit } = useModulePermissions();
+  const { canView: cv, canEdit, loading: permsLoading } = useModulePermissions();
   const canView = isAdmin || cv("medical");
   const allowed = isAdmin || canEdit("medical");
+
+  if (permsLoading) {
+    return (
+      <AppShell>
+        <div className="p-6 text-sm text-muted-foreground">Nalagam…</div>
+      </AppShell>
+    );
+  }
 
   if (!canView) {
     return (
