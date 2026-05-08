@@ -215,6 +215,7 @@ export default function Statistika() {
             </CardContent>
           </Card>
         </div>
+        </>)}
       </div>
     </AppShell>
   );
