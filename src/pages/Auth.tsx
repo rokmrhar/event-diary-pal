@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import ForgotPassword from "@/components/ForgotPassword";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -13,10 +14,11 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [forgot, setForgot] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate("/", { replace: true });
-  }, [user, loading, navigate]);
+    if (!loading && user && !forgot) navigate("/", { replace: true });
+  }, [user, loading, navigate, forgot]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +46,9 @@ export default function Auth() {
       </div>
 
       <div className="bg-white/90 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl p-6">
+        {forgot ? (
+          <ForgotPassword onDone={() => setForgot(false)} />
+        ) : (
         <form onSubmit={handleSignIn} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="email-in">E-pošta</Label>
@@ -59,10 +64,15 @@ export default function Auth() {
             {busy ? "Prijavljam..." : "Prijava"}
           </Button>
 
+          <button type="button" onClick={() => setForgot(true)} className="text-xs underline w-full text-center text-muted-foreground">
+            Pozabljeno geslo?
+          </button>
+
           <p className="text-xs text-muted-foreground text-center">
             Za nov račun se obrnite na administratorja.
           </p>
         </form>
+        )}
       </div>
 
       <p className="text-center text-xs text-white/80">
