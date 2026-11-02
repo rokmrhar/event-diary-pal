@@ -2,3 +2,5 @@ project_id = "ksptcnbwclbedxvanzer"
 
 [functions.send-medical-reminders]
 verify_jwt = false
+[functions.audit-log]
+verify_jwt = false
