@@ -8,6 +8,7 @@ import Index from "./pages/Index.tsx";
 import Auth from "./pages/Auth.tsx";
 import NotFound from "./pages/NotFound.tsx";
 const Admin = lazy(() => import("./pages/Admin.tsx"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
 const Aktivnost = lazy(() => import("./pages/Aktivnost.tsx"));
 const Intervencija = lazy(() => import("./pages/Intervencija.tsx"));
 const ArhivIntervencij = lazy(() => import("./pages/ArhivIntervencij.tsx"));
@@ -51,6 +52,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/aktivnost" element={<Aktivnost />} />
             <Route path="/intervencija" element={<Intervencija />} />
