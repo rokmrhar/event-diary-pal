@@ -133,6 +133,39 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: string | null
+          id: string
+          ip: string | null
+          success: boolean
+          user_id: string | null
+          username: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          ip?: string | null
+          success?: boolean
+          user_id?: string | null
+          username?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          ip?: string | null
+          success?: boolean
+          user_id?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
       cms_pages: {
         Row: {
           content: string
