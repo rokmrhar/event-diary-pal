@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { Mail, Send } from "lucide-react";
+import { logAudit } from "@/lib/audit";
 
 type Settings = {
   id: string;
@@ -78,6 +79,7 @@ export default function SettingsTab() {
       .eq("id", s.id);
     setSaving(false);
     if (error) return toast({ title: "Napaka", description: error.message, variant: "destructive" });
+    logAudit("Sprememba nastavitev", `SMTP: ${s.smtp_host ?? ""}:${s.smtp_port ?? ""}, opomniki: ${s.reminder_days_before} dni, tehnični: ${s.inspection_days_before} dni`);
     toast({ title: "Shranjeno" });
     load();
   };

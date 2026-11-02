@@ -1,3 +1,4 @@
+import { logAudit } from "@/lib/audit";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -202,6 +203,22 @@ export default function UsersTab() {
       return;
     }
     toast({ title: "Shranjeno", description: "Podatki uporabnika so posodobljeni." });
+    logAudit("Sprememba uporabnika", `${editing.email ?? ""}: ${Object.keys(payload).filter((k) => k !== "user_id").join(", ")}`);
+    closeEdit();
+    load();
+  };
+
+  const deleteUser = async () => {
+    if (!editing) return;
+    if (!confirm(`Res želite izbrisati uporabnika ${editing.email ?? ""}? Tega ni mogoče razveljaviti.`)) return;
+    setSaving(true);
+    const { data, error } = await supabase.functions.invoke("audit-log", {
+      body: { action: "delete_user", user_id: editing.user_id },
+    });
+    setSaving(false);
+    const msg = (data as { error?: string })?.error ?? error?.message;
+    if (msg) return toast({ title: "Napaka pri brisanju", description: msg, variant: "destructive" });
+    toast({ title: "Uporabnik izbrisan" });
     closeEdit();
     load();
   };
@@ -390,6 +407,9 @@ export default function UsersTab() {
             </div>
           )}
           <DialogFooter className="gap-2">
+            <Button variant="destructive" onClick={deleteUser} disabled={saving} className="sm:mr-auto">
+              Izbriši uporabnika
+            </Button>
             <Button variant="outline" onClick={closeEdit} disabled={saving}>
               Zapri
             </Button>

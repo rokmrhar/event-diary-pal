@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import ForgotPassword from "@/components/ForgotPassword";
+import { logAudit } from "@/lib/audit";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -24,10 +25,13 @@ export default function Auth() {
     e.preventDefault();
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
     if (error) {
+      setBusy(false);
+      logAudit("login_failed", error.message, { username: email.trim() });
       toast({ title: "Napaka pri prijavi", description: error.message, variant: "destructive" });
     } else {
+      await logAudit("Prijava");
+      setBusy(false);
       navigate("/", { replace: true });
     }
   };
