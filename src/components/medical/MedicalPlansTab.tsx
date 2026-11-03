@@ -213,7 +213,7 @@ export default function MedicalPlansTab({ rows, canEdit }: { rows: CheckRow[]; c
             </div>
             <div className="space-y-1.5">
               <Label>Datum pregleda</Label>
-              <DatePickerSI value={form.planned_date} onChange={(v) => setForm((p) => ({ ...p, planned_date: v }))} />
+              <DatePickerSI drilldown value={form.planned_date} onChange={(v) => setForm((p) => ({ ...p, planned_date: v }))} />
             </div>
             <div className="space-y-1.5">
               <Label>Lokacija</Label>
