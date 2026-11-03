@@ -778,7 +778,9 @@ export type Database = {
       medical_checks: {
         Row: {
           created_at: string
+          delo_na_visini: boolean
           id: string
+          ida: boolean
           member_name: string
           naslednji_pregled: string | null
           opombe: string | null
@@ -788,7 +790,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          delo_na_visini?: boolean
           id?: string
+          ida?: boolean
           member_name: string
           naslednji_pregled?: string | null
           opombe?: string | null
@@ -798,7 +802,9 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          delo_na_visini?: boolean
           id?: string
+          ida?: boolean
           member_name?: string
           naslednji_pregled?: string | null
           opombe?: string | null

@@ -88,25 +88,25 @@ export default function AppShell({ children }: AppShellProps) {
         </div>
 
         {/* Logo placeholder */}
-        <div className="flex items-center justify-center py-6 border-b border-white/10">
-          <div className="h-36 w-36 rounded-full bg-brand-red flex items-center justify-center shadow-md overflow-hidden">
+        <div className="flex items-center justify-center py-3 border-b border-white/10">
+          <div className="h-24 w-24 rounded-full bg-brand-red flex items-center justify-center shadow-md overflow-hidden">
           <img src="/operativa_logo_vektor.png" alt="Logo" className="h-full w-full object-cover" />
           </div>
         </div>
 
         {/* Title */}
-        <div className="px-4 pt-5 pb-3 flex justify-center">
+        <div className="px-4 pt-2 pb-1 flex justify-center">
           <h2 className="text-sm font-bold tracking-wide text-center"> PGD ŠEMPETER PRI GORICI </h2>
         </div>
 
         {/* Nav items (loaded from DB, editable in admin) */}
-        <nav className="flex-1 overflow-y-auto px-2 py-1 space-y-0.5 text-[11px] font-semibold">
+        <nav className="flex-1 min-h-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-2 py-1 space-y-0 text-[11px] font-semibold">
           {visibleItems.map((item) => {
             if (item.kind === "separator") {
               return (
                 <div
                   key={item.id}
-                  className="px-2 py-2 mt-1 flex items-center gap-2 text-xs uppercase text-white/50"
+                  className="px-2 py-1 mt-0.5 flex items-center gap-2 text-[10px] uppercase text-white/50"
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
                   {item.label}
@@ -115,7 +115,7 @@ export default function AppShell({ children }: AppShellProps) {
             }
             const Icon = getIcon(item.icon);
             const cls =
-              "w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-white/10 text-left tracking-wide";
+              "w-full flex items-center gap-3 px-3 py-1.5 rounded hover:bg-white/10 text-left tracking-wide";
             const inner = (
               <>
                 <Icon className="h-4 w-4 text-brand-red shrink-0" />
@@ -157,7 +157,7 @@ export default function AppShell({ children }: AppShellProps) {
         </nav>
 
         {/* Footer */}
-        <div className="px-4 py-3 text-[10px] text-white/40 border-t border-white/10 italic">
+        <div className="px-4 py-1.5 text-[10px] text-white/40 border-t border-white/10 italic">
           Izdelava: Rok Mrhar, 2026
         </div>
       </aside>

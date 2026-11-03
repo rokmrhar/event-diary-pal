@@ -31,6 +31,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DatePickerSI } from "@/components/ui/date-picker-si";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -46,6 +47,8 @@ type Row = {
   zadnji_pregled: string | null;
   naslednji_pregled: string | null;
   opombe: string | null;
+  ida: boolean;
+  delo_na_visini: boolean;
 };
 
 function daysUntil(iso: string | null): number | null {
@@ -76,7 +79,7 @@ export default function ZdravniskiPregledi() {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
-  const [form, setForm] = useState({ member_name: "", zadnji_pregled: "", naslednji_pregled: "", opombe: "" });
+  const [form, setForm] = useState({ member_name: "", zadnji_pregled: "", naslednji_pregled: "", opombe: "", ida: false, delo_na_visini: false });
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
@@ -84,7 +87,7 @@ export default function ZdravniskiPregledi() {
     setLoading(true);
     const { data, error } = await supabase
       .from("medical_checks")
-      .select("id, user_id, member_name, zadnji_pregled, naslednji_pregled, opombe")
+      .select("id, user_id, member_name, zadnji_pregled, naslednji_pregled, opombe, ida, delo_na_visini")
       .order("naslednji_pregled", { ascending: true, nullsFirst: false });
     if (error) toast({ title: "Napaka", description: error.message, variant: "destructive" });
     setRows((data as Row[]) ?? []);
@@ -124,7 +127,7 @@ export default function ZdravniskiPregledi() {
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ member_name: "", zadnji_pregled: "", naslednji_pregled: "", opombe: "" });
+    setForm({ member_name: "", zadnji_pregled: "", naslednji_pregled: "", opombe: "", ida: false, delo_na_visini: false });
     setOpen(true);
   };
 
@@ -135,6 +138,8 @@ export default function ZdravniskiPregledi() {
       zadnji_pregled: row.zadnji_pregled ?? "",
       naslednji_pregled: row.naslednji_pregled ?? "",
       opombe: row.opombe ?? "",
+      ida: !!row.ida,
+      delo_na_visini: !!row.delo_na_visini,
     });
     setOpen(true);
   };
@@ -158,6 +163,8 @@ export default function ZdravniskiPregledi() {
       zadnji_pregled: form.zadnji_pregled || null,
       naslednji_pregled: form.naslednji_pregled || null,
       opombe: form.opombe.trim() || null,
+      ida: form.ida,
+      delo_na_visini: form.delo_na_visini,
     };
     setSaving(true);
     if (editing) {
@@ -219,15 +226,17 @@ export default function ZdravniskiPregledi() {
                 <TableHead>Zadnji pregled</TableHead>
                 <TableHead>Naslednji pregled</TableHead>
                 <TableHead>Dni do preteka</TableHead>
+                <TableHead>IDA</TableHead>
+                <TableHead>Delo na višini</TableHead>
                 <TableHead>Opombe</TableHead>
                 {allowed && <TableHead className="text-right w-[120px]">Akcije</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow><TableCell colSpan={5 + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">Nalagam...</TableCell></TableRow>
+                <TableRow><TableCell colSpan={7 + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">Nalagam...</TableCell></TableRow>
               ) : visible.length === 0 ? (
-                <TableRow><TableCell colSpan={5 + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">Ni zapisov</TableCell></TableRow>
+                <TableRow><TableCell colSpan={7 + (allowed ? 1 : 0)} className="text-center text-muted-foreground py-8">Ni zapisov</TableCell></TableRow>
               ) : (
                 visible.map((r) => {
                   const dni = daysUntil(r.naslednji_pregled);
@@ -237,6 +246,8 @@ export default function ZdravniskiPregledi() {
                       <TableCell>{r.zadnji_pregled ? formatDateSI(r.zadnji_pregled) : "—"}</TableCell>
                       <TableCell>{r.naslednji_pregled ? formatDateSI(r.naslednji_pregled) : "—"}</TableCell>
                       <TableCell>{statusBadge(dni)}</TableCell>
+                      <TableCell>{r.ida ? "✓" : "—"}</TableCell>
+                      <TableCell>{r.delo_na_visini ? "✓" : "—"}</TableCell>
                       <TableCell className="max-w-xs truncate text-muted-foreground text-sm">{r.opombe || "—"}</TableCell>
                       {allowed && (
                         <TableCell className="text-right">
@@ -280,12 +291,22 @@ export default function ZdravniskiPregledi() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label>Zadnji zdravniški pregled</Label>
-                  <DatePickerSI value={form.zadnji_pregled} onChange={(v) => setForm((p) => ({ ...p, zadnji_pregled: v }))} />
+                  <DatePickerSI drilldown value={form.zadnji_pregled} onChange={(v) => setForm((p) => ({ ...p, zadnji_pregled: v }))} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Naslednji zdravniški pregled</Label>
-                  <DatePickerSI value={form.naslednji_pregled} onChange={(v) => setForm((p) => ({ ...p, naslednji_pregled: v }))} />
+                  <DatePickerSI drilldown value={form.naslednji_pregled} onChange={(v) => setForm((p) => ({ ...p, naslednji_pregled: v }))} />
                 </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
+                <label className="flex items-center gap-2 text-sm">
+                  <Checkbox checked={form.ida} onCheckedChange={(c) => setForm((p) => ({ ...p, ida: c === true }))} />
+                  Izolirni dihalni aparat
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <Checkbox checked={form.delo_na_visini} onCheckedChange={(c) => setForm((p) => ({ ...p, delo_na_visini: c === true }))} />
+                  Delo na višini (5., 6. člen)
+                </label>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="opombe">Opombe</Label>

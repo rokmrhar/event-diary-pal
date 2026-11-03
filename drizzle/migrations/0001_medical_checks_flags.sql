@@ -1,0 +1,1 @@
+ALTER TABLE public.medical_checks ADD COLUMN IF NOT EXISTS ida boolean NOT NULL DEFAULT false, ADD COLUMN IF NOT EXISTS delo_na_visini boolean NOT NULL DEFAULT false;

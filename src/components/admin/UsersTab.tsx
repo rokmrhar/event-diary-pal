@@ -455,7 +455,10 @@ export default function UsersTab() {
                   body: { email: newEmail, password: newPass, display_name: newName, make_admin: newAdmin },
                 });
                 setCreating(false);
-                const errMsg = (data as { error?: string })?.error ?? error?.message;
+                let errMsg = (data as { error?: string })?.error ?? error?.message;
+                if (error && (error as { context?: Response }).context) {
+                  try { errMsg = (await (error as { context: Response }).context.json())?.error ?? errMsg; } catch { /* ignore */ }
+                }
                 if (errMsg) {
                   toast({ title: "Napaka", description: errMsg, variant: "destructive" });
                   return;
