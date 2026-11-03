@@ -228,8 +228,14 @@ async function runJob(supabase: any, settings: Settings, tplMap: Map<string, { s
       const { data: vehData } = await supabase.from("vehicles").select("id, oznaka, registracija").in("id", vehIds);
       // deno-lint-ignore no-explicit-any
       const vehMap = new Map((vehData ?? []).map((v: any) => [v.id, v]));
+      const { data: sentLogs } = await supabase.from("email_log").select("related_id, created_at")
+        .eq("type", "tehnicni").eq("status", "sent").in("related_id", cands.map((c) => c.id));
       const tpl = tplMap.get("tehnicni");
       for (const c of cands) {
+        // Send only once per inspection due date (within its reminder window)
+        const windowStart = new Date(c.naslednji_pregled + "T00:00:00"); windowStart.setDate(windowStart.getDate() - daysBefore - 1);
+        // deno-lint-ignore no-explicit-any
+        if ((sentLogs ?? []).some((l: any) => l.related_id === c.id && new Date(l.created_at) >= windowStart)) continue;
         // deno-lint-ignore no-explicit-any
         const v = vehMap.get(c.vehicle_id) as any;
         const label = v ? `${v.oznaka}${v.registracija ? ` (${v.registracija})` : ""}` : "Vozilo";
