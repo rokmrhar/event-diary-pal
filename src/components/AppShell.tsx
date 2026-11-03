@@ -88,8 +88,8 @@ export default function AppShell({ children }: AppShellProps) {
         </div>
 
         {/* Logo placeholder */}
-        <div className="flex items-center justify-center py-3 border-b border-white/10">
-          <div className="h-24 w-24 rounded-full bg-brand-red flex items-center justify-center shadow-md overflow-hidden">
+        <div className="flex items-center justify-center py-2.5 border-b border-white/10">
+          <div className="h-28 w-28 rounded-full bg-brand-red flex items-center justify-center shadow-md overflow-hidden">
           <img src="/operativa_logo_vektor.png" alt="Logo" className="h-full w-full object-cover" />
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function AppShell({ children }: AppShellProps) {
         </div>
 
         {/* Nav items (loaded from DB, editable in admin) */}
-        <nav className="flex-1 min-h-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-2 py-1 space-y-0 text-[11px] font-semibold">
+        <nav className="flex-1 min-h-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-2 py-1 space-y-0 text-xs font-semibold">
           {visibleItems.map((item) => {
             if (item.kind === "separator") {
               return (
