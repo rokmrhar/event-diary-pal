@@ -60,7 +60,8 @@ export default function ActivitiesTab() {
       supabase
         .from("activities")
         .select("id, datum, aktivnost, aktivnost_drugo, zacetek, konec, kraj, opis")
-        .order("datum", { ascending: false }),
+        .order("datum", { ascending: false })
+        .order("zacetek", { ascending: false }),
       supabase.from("activity_attendees").select("id, person_name, activity_id"),
     ]);
     if (act.error || att.error) {
@@ -89,15 +90,23 @@ export default function ActivitiesTab() {
     return m;
   }, [attendees]);
 
-  const visible = activities.filter((a) => {
-    const q = search.toLowerCase();
-    return (
-      labelFor(a).toLowerCase().includes(q) ||
-      a.kraj.toLowerCase().includes(q) ||
-      a.opis.toLowerCase().includes(q) ||
-      a.datum.includes(q)
-    );
-  });
+  const visible = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const filtered = q
+      ? activities.filter(
+          (a) =>
+            labelFor(a).toLowerCase().includes(q) ||
+            a.kraj.toLowerCase().includes(q) ||
+            a.opis.toLowerCase().includes(q) ||
+            a.datum.includes(q)
+        )
+      : activities;
+    return [...filtered].sort((a, b) => {
+      if (a.datum !== b.datum) return a.datum < b.datum ? 1 : -1;
+      if ((a.zacetek ?? "") !== (b.zacetek ?? "")) return (a.zacetek ?? "") < (b.zacetek ?? "") ? 1 : -1;
+      return 0;
+    });
+  }, [activities, search]);
 
   const startEdit = (a: ActivityRow) => {
     setEditing({ ...a });
